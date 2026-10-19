@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-19T13:07:02.6195580Z",
+  "generatedAt": "2026-10-19T13:19:15.5993470Z",
   "rootMarker": "knowledge-base.json",
   "excludes": [
     "PORTABLE-MANIFEST.json",
@@ -70,8 +70,8 @@
     },
     {
       "path": "辅助\\日志\\知识库日志.md",
-      "bytes": 127859,
-      "sha256": "db36f92e4077f29926bd5821d27b9fbc2377f0ea419efe879617edd77cc30317"
+      "bytes": 129000,
+      "sha256": "31dd44267cc7b7982684f32b3f32ac51986a1792a56b8b4b7f4419d5af04507a"
     },
     {
       "path": "辅助\\摄入队列\\摄入队列.md",
@@ -7795,8 +7795,8 @@
     },
     {
       "path": "项目\\进行中\\20261019_灵犀自媒体平台国内版.md",
-      "bytes": 6483,
-      "sha256": "7daa08e2c5101e7ca0e07f33df9aa63df56047366fd6c70c6081c811b4b07adb"
+      "bytes": 8145,
+      "sha256": "980b1a4ae94ee01376c5791bf1c3b7414440d69677cd063a5412dfb8d3b4d406"
     },
     {
       "path": "项目\\进行中\\毛选综合蒸馏_2026-08-24.md",
@@ -7835,8 +7835,8 @@
     },
     {
       "path": "资产\\报告\\20261019_灵犀自媒体平台国内版知识整理与验收.md",
-      "bytes": 8820,
-      "sha256": "2215993125aaf660ee62152d227864b4cb98ff91b8e23e734e3dfe3b957a13b0"
+      "bytes": 10612,
+      "sha256": "67f1a00063e1a209679d122959fa70b2ca041372ceab0bad770d86a015c1a9d3"
     },
     {
       "path": "资产\\报告\\本地知识库搭建复盘_2026-08-21.md",
