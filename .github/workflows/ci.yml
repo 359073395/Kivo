@@ -14,6 +14,19 @@ env:
   LINGXI_API_TOOLS: '0'
 
 jobs:
+  desktop-runtime:
+    name: Desktop data protection (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - run: node --test desktop/tests/runtime.test.cjs
+
   validate-skills:
     name: Skill contracts
     runs-on: ubuntu-latest

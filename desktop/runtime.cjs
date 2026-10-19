@@ -4,6 +4,29 @@ const crypto = require('node:crypto');
 const net = require('node:net');
 
 const sha = (buffer) => crypto.createHash('sha256').update(buffer).digest('hex');
+
+function replaceFile(temp, target) {
+  try { fs.renameSync(temp, target); }
+  catch (error) {
+    if (error.code !== 'EXDEV') throw error;
+    // Windows encrypted/redirected AppData can reject even a same-folder rename.
+    // Keep a verified rollback copy before the non-atomic copy fallback. Never
+    // apply this to user files directly; callers have already checked ownership.
+    const expected = sha(fs.readFileSync(temp));
+    const backup = fs.existsSync(target) ? target + '.' + crypto.randomUUID() + '.rollback' : null;
+    if (backup) fs.copyFileSync(target, backup, fs.constants.COPYFILE_EXCL);
+    try {
+      fs.copyFileSync(temp, target);
+      if (sha(fs.readFileSync(target)) !== expected) throw new Error('跨盘复制后校验失败');
+    } catch (copyError) {
+      if (backup) fs.copyFileSync(backup, target);
+      else if (fs.existsSync(target)) fs.unlinkSync(target);
+      throw copyError;
+    }
+    if (backup) fs.unlinkSync(backup);
+    fs.unlinkSync(temp);
+  }
+}
 function inside(root, relative) {
   if (typeof relative !== 'string' || !relative || relative.includes('\\') || path.isAbsolute(relative)) throw new Error('安装清单路径无效');
   const target = path.resolve(root, relative);
@@ -33,7 +56,7 @@ function syncPlatform(bundle, userData) {
     fs.mkdirSync(path.dirname(target), { recursive: true });
     const temp = target + '.' + crypto.randomUUID() + '.tmp';
     fs.writeFileSync(temp, body);
-    fs.renameSync(temp, target);
+    replaceFile(temp, target);
     count += 1;
   }
   // Runtime/user files are deliberately never enumerated for deletion.
@@ -69,7 +92,7 @@ function syncRuntime(bundle, userData) {
     if (fs.existsSync(target) && sha(fs.readFileSync(target)) === file.sha256) continue;
     fs.mkdirSync(path.dirname(target), { recursive: true });
     const temp = target + '.' + crypto.randomUUID() + '.tmp';
-    fs.writeFileSync(temp, body); fs.renameSync(temp, target);
+    fs.writeFileSync(temp, body); replaceFile(temp, target);
   }
   return path.join(root, 'python.exe');
 }
@@ -99,7 +122,7 @@ function syncKnowledge(bundle, userData) {
     } else added += 1;
     fs.mkdirSync(path.dirname(target), { recursive: true });
     const temp = target + '.' + crypto.randomUUID() + '.tmp';
-    fs.writeFileSync(temp, body); fs.renameSync(temp, target);
+    fs.writeFileSync(temp, body); replaceFile(temp, target);
     baseline[file.path] = file.sha256;
   }
   fs.writeFileSync(stateFile, JSON.stringify({ version: manifest.version, hashes: baseline, conflicts }, null, 2));
@@ -113,4 +136,4 @@ function freePort() {
     server.listen(0, '127.0.0.1', () => { const { port } = server.address(); server.close(() => resolve(port)); });
   });
 }
-module.exports = { inside, sha, syncPlatform, syncRuntime, syncKnowledge, updateUrl, freePort };
+module.exports = { inside, sha, replaceFile, syncPlatform, syncRuntime, syncKnowledge, updateUrl, freePort };

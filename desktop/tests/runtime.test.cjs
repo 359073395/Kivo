@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { inside, sha, syncPlatform, syncKnowledge, updateUrl, freePort } = require('../runtime.cjs');
+const { inside, sha, replaceFile, syncPlatform, syncKnowledge, updateUrl, freePort } = require('../runtime.cjs');
 
 function fixture(kind) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kivo-test-'));
@@ -58,4 +58,25 @@ test('a corrupted install payload stops before writing the corrupted file', () =
   fs.writeFileSync(path.join(bundle, 'platform/web/app.py'), 'corrupted');
   assert.throws(() => syncPlatform(bundle, user), /校验失败/);
   assert.equal(fs.existsSync(path.join(user, 'platform/web/app.py')), false);
+});
+
+test('EXDEV falls back to checked copying and preserves the existing file on failure', () => {
+  const { user } = fixture('platform');
+  const temp = path.join(user, 'code.tmp'), target = path.join(user, 'code.py');
+  const rename = fs.renameSync, copy = fs.copyFileSync;
+  fs.writeFileSync(temp, 'new'); fs.writeFileSync(target, 'old');
+  fs.renameSync = () => { throw Object.assign(new Error('cross-device'), { code: 'EXDEV' }); };
+  try {
+    replaceFile(temp, target);
+    assert.equal(fs.readFileSync(target, 'utf8'), 'new');
+    assert.equal(fs.existsSync(temp), false);
+    fs.writeFileSync(temp, 'next');
+    fs.copyFileSync = (source, dest, flags) => {
+      if (source === temp) { fs.writeFileSync(dest, 'partial'); throw new Error('copy interrupted'); }
+      return copy(source, dest, flags);
+    };
+    assert.throws(() => replaceFile(temp, target), /copy interrupted/);
+    assert.equal(fs.readFileSync(target, 'utf8'), 'new');
+    assert.equal(fs.readFileSync(temp, 'utf8'), 'next');
+  } finally { fs.renameSync = rename; fs.copyFileSync = copy; }
 });
