@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param([int]$Port = 7860, [switch]$Foreground, [switch]$SkipSync)
 $ErrorActionPreference = 'Stop'
 $projectRoot = $PSScriptRoot
