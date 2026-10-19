@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { inside, sha, replaceFile, syncPlatform, syncKnowledge, updateUrl, freePort } = require('../runtime.cjs');
+const { inside, sha, replaceFile, syncPlatform, syncRuntime, syncKnowledge, updateUrl, freePort } = require('../runtime.cjs');
 
 function fixture(kind) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kivo-test-'));
@@ -79,4 +79,14 @@ test('EXDEV falls back to checked copying and preserves the existing file on fai
     assert.equal(fs.readFileSync(target, 'utf8'), 'new');
     assert.equal(fs.readFileSync(temp, 'utf8'), 'next');
   } finally { fs.renameSync = rename; fs.copyFileSync = copy; }
+});
+
+test('embedded Python is verified in the install directory without duplicating user data', () => {
+  const { bundle, user } = fixture('python');
+  put(bundle, 'python', '0.3.0', { 'python.exe': 'verified-interpreter' });
+  fs.copyFileSync(path.join(bundle, 'python-manifest.json'), path.join(bundle, 'runtime-manifest.json'));
+  assert.equal(syncRuntime(bundle, user), path.join(bundle, 'python/python.exe'));
+  assert.equal(fs.existsSync(path.join(user, 'runtime')), false);
+  fs.writeFileSync(path.join(bundle, 'python/python.exe'), 'tampered');
+  assert.throws(() => syncRuntime(bundle, user), /运行环境校验失败/);
 });

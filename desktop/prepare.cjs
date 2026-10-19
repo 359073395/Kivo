@@ -32,7 +32,8 @@ fs.copyFileSync(path.join(__dirname, 'backend.py'), path.join(platform, 'desktop
 const python = path.join(out, 'python');
 if (!fs.existsSync(path.join(python, 'python.exe'))) throw new Error('先运行Prepare-Python.ps1准备官方嵌入式运行环境');
 walk(path.join(root, '.venv', 'Lib', 'site-packages'), path.join(python, 'Lib', 'site-packages'), (name) => !/^__editable__|\.pth$|^[tw]64-arm(?:64)?\.exe$|^(?:pytest|_pytest|iniconfig|pluggy)(?:-|\.|$)/.test(name));
-fs.writeFileSync(path.join(python, 'python314._pth'), 'python314.zip\n.\nLib/site-packages\n../../platform\n../../platform/skills/shared/scripts\nimport site\n');
+fs.copyFileSync(path.join(__dirname, 'sitecustomize.py'), path.join(python, 'Lib', 'site-packages', 'sitecustomize.py'));
+fs.writeFileSync(path.join(python, 'python314._pth'), 'python314.zip\n.\nLib/site-packages\nimport site\n');
 
 function manifest(folder, destination, include = () => true) {
   const files = [];

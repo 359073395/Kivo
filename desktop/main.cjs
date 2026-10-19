@@ -132,9 +132,14 @@ else {
       status('正在校验程序，保留本机配置与学习数据…');
       const installed = syncPlatform(bundle, app.getPath('userData'));
       status('正在准备随App附带的运行环境…');
-      const python = syncRuntime(bundle, app.getPath('userData'));
+      const python = syncRuntime(bundle);
       status('正在准备本地知识库，保留个人修改…');
-      const knowledge = syncKnowledge(bundle, app.getPath('userData'));
+      const formalVault = 'F:\\Knowledge';
+      const selectedVault = config().knowledgeRoot || process.env.LINGXI_KNOWLEDGE_ROOT || (fs.existsSync(path.join(formalVault, 'knowledge-base.json')) ? formalVault : '');
+      const localVault = path.join(app.getPath('userData'), 'knowledge-vault');
+      const knowledge = selectedVault && path.resolve(selectedVault) !== path.resolve(localVault)
+        ? { root: selectedVault, conflicts: 0 }
+        : syncKnowledge(bundle, app.getPath('userData'));
       const harnessConfig = path.join(installed.root, 'outputs', '_harness', 'config.json');
       if (!fs.existsSync(harnessConfig)) {
         fs.mkdirSync(path.dirname(harnessConfig), { recursive: true });
@@ -143,13 +148,12 @@ else {
       const port = await freePort();
       const envPath = path.join(app.getPath('userData'), 'model.env');
       if (!fs.existsSync(envPath)) fs.writeFileSync(envPath, '# Kivo桌面版本机配置，不进入安装包。\n');
-      const formalVault = 'F:\\Knowledge';
-      const knowledgeRoot = config().knowledgeRoot || process.env.LINGXI_KNOWLEDGE_ROOT || (fs.existsSync(path.join(formalVault, 'knowledge-base.json')) ? formalVault : knowledge.root);
+      const knowledgeRoot = knowledge.root;
       const dataRoot = config().knowledgeDataRoot || path.join(app.getPath('userData'), 'knowledge');
       const stdout = fs.openSync(path.join(app.getPath('userData'), 'server.log'), 'a');
       server = spawn(python, [path.join(installed.root, 'desktop', 'backend.py')], {
         cwd: installed.root, windowsHide: true, stdio: ['ignore', stdout, stdout],
-        env: { ...process.env, EASEL_PORT: String(port), LINGXI_ENV_FILE: envPath,
+        env: { ...process.env, EASEL_PORT: String(port), LINGXI_ENV_FILE: envPath, KIVO_PLATFORM_ROOT: installed.root,
           LINGXI_KNOWLEDGE_ROOT: knowledgeRoot, LINGXI_DATA_ROOT: dataRoot, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8' },
       });
       fs.closeSync(stdout);

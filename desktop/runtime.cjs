@@ -81,18 +81,15 @@ function updateUrl(value) {
   return url.href.replace(/\/?$/, '/');
 }
 
-function syncRuntime(bundle, userData) {
+function syncRuntime(bundle) {
   const manifest = JSON.parse(fs.readFileSync(path.join(bundle, 'runtime-manifest.json'), 'utf8'));
-  const root = path.join(userData, 'runtime', 'python');
-  fs.mkdirSync(root, { recursive: true });
+  // The embedded interpreter belongs to the installed program, not user data.
+  // Validate it in place: copying it into encrypted AppData doubles disk usage
+  // and can add minutes to first launch. backend.py adds the local platform root.
+  const root = path.join(bundle, 'python');
   for (const file of manifest.files) {
-    const source = inside(path.join(bundle, 'python'), file.path), target = inside(root, file.path);
-    const body = fs.readFileSync(source);
+    const body = fs.readFileSync(inside(root, file.path));
     if (sha(body) !== file.sha256) throw new Error('运行环境校验失败：' + file.path);
-    if (fs.existsSync(target) && sha(fs.readFileSync(target)) === file.sha256) continue;
-    fs.mkdirSync(path.dirname(target), { recursive: true });
-    const temp = target + '.' + crypto.randomUUID() + '.tmp';
-    fs.writeFileSync(temp, body); replaceFile(temp, target);
   }
   return path.join(root, 'python.exe');
 }

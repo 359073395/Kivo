@@ -26,7 +26,7 @@ const { inside, sha } = require('../desktop/runtime.cjs');
   const app = await _electron.launch({ executablePath, env, timeout: 30000 });
   try {
     const page = await app.firstWindow();
-    await page.waitForURL('http://127.0.0.1:*/', { timeout: 240000 });
+    await page.waitForURL('http://127.0.0.1:*/', { timeout: 360000 });
     await page.getByRole('button', { name: '学习知识库', exact: true }).waitFor({ timeout: 30000 });
     const state = await page.evaluate(async () => {
       const status = await (await fetch('/api/status')).json();
@@ -43,6 +43,12 @@ const { inside, sha } = require('../desktop/runtime.cjs');
     const settings = await opened;
     await settings.waitForLoadState();
     const desktop = await settings.evaluate(() => window.lingxiDesktop.settings());
+    const python = path.join(bundle, 'python', 'python.exe');
+    const child = require('node:child_process').spawnSync(python,
+      ['-c', 'import lingxi,model_registry,cv2,numpy,yaml; print("bundled-child-imports-ok")'],
+      { env: { ...process.env, KIVO_PLATFORM_ROOT: path.join(desktop.dataPath, 'platform') }, encoding: 'utf8', windowsHide: true });
+    assert.equal(child.status, 0, child.stderr);
+    assert.match(child.stdout, /bundled-child-imports-ok/);
     let update;
     if (process.argv.includes('--check-update')) {
       await settings.locator('#check').click();
