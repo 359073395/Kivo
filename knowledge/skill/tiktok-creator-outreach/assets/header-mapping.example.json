@@ -1,0 +1,12 @@
+{
+  "达人账号": "creator_handle",
+  "达人主页": "creator_url",
+  "达人昵称": "nickname",
+  "国家/地区": "country",
+  "内容语言": "language",
+  "粉丝数": "followers",
+  "最近视频播放": "recent_views",
+  "互动率": "engagement_rate_pct",
+  "达人类目": "content_category",
+  "联系方式": "contact_channel"
+}

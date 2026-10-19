@@ -1,0 +1,6 @@
+interface:
+  display_name: "知识蒸馏"
+  short_description: "完整文字化、蒸馏，并同步到现有 Skill 自动调用"
+  default_prompt: "Use $knowledge-distillation to convert this source into a complete local text manuscript, distill it into reusable methods, and sync approved methods into the relevant existing Skills."
+policy:
+  allow_implicit_invocation: true

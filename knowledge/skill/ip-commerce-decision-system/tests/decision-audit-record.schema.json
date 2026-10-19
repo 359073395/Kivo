@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Minimal observable decision audit record",
+  "type": "object",
+  "required": ["taskType", "mode", "qualification", "observableFacts", "fieldEffects", "coupling", "actionOrDecision", "hardGate", "readbackOrPrecommitSignal"],
+  "properties": {
+    "taskType": {"enum": ["fact", "execution", "judgment", "value", "mixed"]},
+    "mode": {"enum": ["compact", "full", "irreversible"]},
+    "qualification": {"type": "string", "minLength": 1},
+    "observableFacts": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "fieldEffects": {
+      "type": "object",
+      "required": ["equation", "leverageBoundary", "assumptions"],
+      "additionalProperties": {"$ref": "#/$defs/effect"}
+    },
+    "coupling": {
+      "type": "object",
+      "required": ["effect", "observableReason"],
+      "properties": {"effect": {"enum": ["changed", "confirmed", "rejected", "unrelated"]}, "observableReason": {"type": "string", "minLength": 1}},
+      "additionalProperties": false
+    },
+    "actionOrDecision": {"type": "string", "minLength": 1},
+    "hardGate": {"type": "string", "minLength": 1},
+    "readbackOrPrecommitSignal": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "effect": {
+      "type": "object",
+      "required": ["effect", "observableReason"],
+      "properties": {"effect": {"enum": ["changed", "confirmed", "rejected", "prevented_error", "no_material_effect"]}, "observableReason": {"type": "string", "minLength": 1}},
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

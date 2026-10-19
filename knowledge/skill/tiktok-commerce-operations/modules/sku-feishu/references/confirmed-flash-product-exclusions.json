@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "policy": "Exact store-folder and Product ID pairs that the user explicitly confirmed should not be written to Flash Deal.",
+  "exclusions": [
+    {
+      "folder": "ALAMI-LAB",
+      "productId": "1732527323060078443",
+      "reason": "Multiple SKUs have different final prices"
+    },
+    {
+      "folder": "BEAU-LAB",
+      "productId": "1731963984567960605",
+      "reason": "Incomplete exact price mapping"
+    },
+    {
+      "folder": "BEAU-LAB",
+      "productId": "1731964374116566045",
+      "reason": "Multiple SKUs have different final prices"
+    },
+    {
+      "folder": "BEAU-LAB",
+      "productId": "1731964374277981213",
+      "reason": "Multiple SKUs have different final prices"
+    },
+    {
+      "folder": "BEAU-LAB",
+      "productId": "1737017687085319197",
+      "reason": "Multiple SKUs have different final prices"
+    },
+    {
+      "folder": "BEAU-LAB",
+      "productId": "1737018017937392669",
+      "reason": "Multiple SKUs have different final prices"
+    },
+    {
+      "folder": "BEAU-LAB",
+      "productId": "1737018018757051421",
+      "reason": "Multiple SKUs have different final prices"
+    },
+    {
+      "folder": "Sugar-Spice",
+      "productId": "1734018458336986168",
+      "reason": "同一Product ID对应多个不同SKU，整项跳过",
+      "confirmedAt": "2026-09-22",
+      "userQuote": "同一Product ID多个SKU就跳过"
+    },
+    {
+      "folder": "Sugar-Spice",
+      "productId": "1734021247129322552",
+      "reason": "同一Product ID对应多个不同SKU，整项跳过",
+      "confirmedAt": "2026-09-22",
+      "userQuote": "同一Product ID多个SKU就跳过"
+    },
+    {
+      "folder": "Sugar-Spice",
+      "productId": "1734022180823270456",
+      "reason": "同一Product ID对应多个不同SKU，整项跳过",
+      "confirmedAt": "2026-09-22",
+      "userQuote": "同一Product ID多个SKU就跳过"
+    },
+    {
+      "folder": "Sugar-Spice",
+      "productId": "1734022521068028984",
+      "reason": "同一Product ID对应多个不同SKU，整项跳过",
+      "confirmedAt": "2026-09-22",
+      "userQuote": "同一Product ID多个SKU就跳过"
+    },
+    {
+      "folder": "Sugar-Spice",
+      "productId": "1734022936101356600",
+      "reason": "同一Product ID对应多个不同SKU，整项跳过",
+      "confirmedAt": "2026-09-22",
+      "userQuote": "同一Product ID多个SKU就跳过"
+    },
+    {
+      "folder": "Sugar-Spice",
+      "productId": "1734023874164524088",
+      "reason": "同一Product ID对应多个不同SKU，整项跳过",
+      "confirmedAt": "2026-09-22",
+      "userQuote": "同一Product ID多个SKU就跳过"
+    },
+    {
+      "folder": "Sugar-Spice",
+      "productId": "1735419981378847800",
+      "reason": "同一Product ID对应多个不同SKU，整项跳过",
+      "confirmedAt": "2026-09-22",
+      "userQuote": "同一Product ID多个SKU就跳过"
+    }
+  ]
+}

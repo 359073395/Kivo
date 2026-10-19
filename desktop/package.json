@@ -1,0 +1,26 @@
+{
+  "name": "kivo-desktop",
+  "version": "0.3.0",
+  "description": "Kivo 本地知识驱动创作工作台 Windows 桌面版",
+  "author": "Kivo",
+  "license": "Apache-2.0",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.cjs",
+    "build": "electron-builder --win nsis --publish never"
+  },
+  "dependencies": { "electron-updater": "6.8.9" },
+  "devDependencies": { "electron": "44.9.0", "electron-builder": "26.15.3" },
+  "build": {
+    "appId": "app.kivo.creator",
+    "productName": "Kivo",
+    "directories": { "output": "dist" },
+    "files": ["main.cjs", "preload.cjs", "runtime.cjs", "splash.html", "splash.cjs", "settings.html", "settings.cjs", "icon.png", "package.json"],
+    "extraResources": [{ "from": "bundle", "to": "lingxi" }],
+    "publish": { "provider": "generic", "url": "https://github.com/359073395/Kivo/releases/latest/download/" },
+    "win": { "target": "nsis", "icon": "icon.png", "artifactName": "Kivo-Setup-${version}.${ext}" },
+    "nsis": { "oneClick": false, "perMachine": false, "allowToChangeInstallationDirectory": true, "createDesktopShortcut": true, "createStartMenuShortcut": true, "deleteAppDataOnUninstall": false }
+  }
+}

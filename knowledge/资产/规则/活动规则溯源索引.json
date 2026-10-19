@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 1,
+  "generatedFor": "2026-08-30 decision-system hardening",
+  "policy": {
+    "activeRuleMustBeCovered": true,
+    "sourceVerificationDoesNotGrantAuthority": true,
+    "missingDirectEvidenceAction": "report_and_add_needs_reconfirm_review_candidate_without_automatic_status_change"
+  },
+  "directEvidenceEntries": [
+    {
+      "ruleId": "SYS-006",
+      "evidenceType": "direct_user_instruction",
+      "evidenceRef": "资源/来源索引/2026-09-28_内部浏览器优先与测品销量交叉核对.md",
+      "governanceStatus": "active",
+      "date": "2026-09-28",
+      "scope": "browser preference addition; path policy retains existing register basis"
+    },
+    {
+      "ruleId": "SYS-007",
+      "evidenceType": "direct_user_instruction",
+      "evidenceRef": "活动规则总表.md source column / 2026-08-21 daily audit request",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "SYS-008",
+      "evidenceType": "direct_user_quote",
+      "evidenceRef": "活动规则总表.md source column",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "SYS-009",
+      "evidenceType": "direct_user_quote",
+      "evidenceRef": "活动规则总表.md source column",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "SYS-010",
+      "evidenceType": "direct_user_quote",
+      "evidenceRef": "活动规则总表.md source column",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "SYS-011",
+      "evidenceType": "direct_user_quote",
+      "evidenceRef": "活动规则总表.md source column",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "SYS-012",
+      "evidenceType": "direct_user_approval",
+      "evidenceRef": "资源/来源索引/2026-08-30_决策系统防机械化规则确认来源卡.md",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "CNT-007",
+      "evidenceType": "task_user_correction_and_approval",
+      "evidenceRef": "task 019fd570-28fb-7bd2-93a4-0e32121a2e10",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "CNT-008",
+      "evidenceType": "task_user_quote",
+      "evidenceRef": "task 019fd570-28fb-7bd2-93a4-0e32121a2e10",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "CNT-009",
+      "evidenceType": "task_user_quote",
+      "evidenceRef": "task 019fd570-28fb-7bd2-93a4-0e32121a2e10",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "CNT-010",
+      "evidenceType": "task_user_corrections_and_approval",
+      "evidenceRef": "资源/来源索引/2026-09-06_商品人物图卖点人群光影透视人体工学规则来源卡.md；tasks 6a0b26a3-9280-83ec-a2ea-8777b2cc8cd4 and 019fd570-28fb-7bd2-93a4-0e32121a2e10",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "CNT-011",
+      "evidenceType": "direct_user_correction_and_approved_sample",
+      "evidenceRef": "资源/来源索引/2026-09-06_商品人物图卖点人群光影透视人体工学规则来源卡.md；task 019fd570-28fb-7bd2-93a4-0e32121a2e10",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "CNT-012",
+      "evidenceType": "direct_user_correction_and_verified_remote_input_mismatch",
+      "evidenceRef": "资源/来源索引/2026-09-06_HeyGen批准图远端输入强绑定规则来源卡.md；task 019fd570-28fb-7bd2-93a4-0e32121a2e10",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "CNT-013",
+      "evidenceType": "direct_user_instruction_and_executed_cleanup",
+      "evidenceRef": "资源/来源索引/2026-09-06_生成媒体只保留批准稿清理规则来源卡.md；task 019fd570-28fb-7bd2-93a4-0e32121a2e10",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "COM-004",
+      "evidenceType": "task_user_quote",
+      "evidenceRef": "task 01a02869-887e-74d2-bb71-e6ab6730d3e2",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "COM-005",
+      "evidenceType": "task_user_quote",
+      "evidenceRef": "task 01a02869-887e-74d2-bb71-e6ab6730d3e2",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "COM-006",
+      "evidenceType": "task_user_quotes",
+      "evidenceRef": "task 01a02869-887e-74d2-bb71-e6ab6730d3e2",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "COM-007",
+      "evidenceType": "task_user_quote_and_screenshot_fact",
+      "evidenceRef": "task 01a02869-887e-74d2-bb71-e6ab6730d3e2",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "COM-008",
+      "evidenceType": "direct_user_quote",
+      "evidenceRef": "活动规则总表.md source column / 2026-08-29",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "COM-009",
+      "evidenceType": "direct_user_instruction_plus_distilled_boundary",
+      "evidenceRef": "活动规则总表.md source column / 2026-08-29",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "COM-011",
+      "evidenceType": "direct_user_correction_and_verified_failure",
+      "evidenceRef": "活动规则总表.md source column / 2026-09-02 current task",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "COM-012",
+      "evidenceType": "direct_user_instruction_and_project_confirmation",
+      "evidenceRef": "task 019ffa1f-170e-7940-8b94-42e1665e0eb2 / 2026-09-02；用户明确默认不报大促、价格1/价格2取低、Product ID与SKU关系，并确认626精确例外；2026-09-12用户指定最新仓库SKU价格源，资源/来源索引/2026-09-12_印尼仓库SKU价格来源卡.md",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "COM-013",
+      "evidenceType": "direct_user_correction_and_instruction",
+      "evidenceRef": "task 01a02869-887e-74d2-bb71-e6ab6730d3e2 / 2026-09-09；用户纠正BEAU-LAB 1737245549493715997零单误删，应保留优化；资源/来源索引/2026-09-09_商品卡零单误删纠正.md；0单一律删除属于AI错误泛化",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "DST-003",
+      "evidenceType": "direct_user_quote",
+      "evidenceRef": "活动规则总表.md source column / 2026-08-29",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "DST-004",
+      "evidenceType": "direct_user_quote",
+      "evidenceRef": "活动规则总表.md source column / 2026-08-29",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "IP-003",
+      "evidenceType": "direct_user_approval_and_prior_direct_correction",
+      "evidenceRef": "资源/来源索引/2026-08-30_决策系统防机械化规则确认来源卡.md",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "IP-004",
+      "evidenceType": "direct_user_framework_alignment_instruction",
+      "evidenceRef": "活动规则总表.md source column / 2026-08-29",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "IP-005",
+      "evidenceType": "direct_user_quote",
+      "evidenceRef": "活动规则总表.md source column / 2026-08-29",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "IP-006",
+      "evidenceType": "direct_user_approval",
+      "evidenceRef": "资源/来源索引/2026-08-30_决策系统防机械化规则确认来源卡.md",
+      "governanceStatus": "active"
+    },
+    {
+      "ruleId": "COM-014",
+      "evidenceType": "direct_user_instruction_and_full_text",
+      "evidenceRef": "资源/来源索引/2026-09-24_电商运营总控规划复盘来源卡.md",
+      "governanceStatus": "active",
+      "provenance": "direct_user_instruction",
+      "verification": "current_user_quote_checked",
+      "date": "2026-09-24"
+    },
+    {
+      "ruleId": "COM-015",
+      "evidenceType": "direct_user_instruction_and_scoped_compilation",
+      "evidenceRef": "资源/来源索引/2026-09-24_公司TikTok运营手册来源卡.md",
+      "governanceStatus": "active",
+      "provenance": "direct_user_instruction",
+      "verification": "current_quote_and_source_checked",
+      "date": "2026-09-24"
+    },
+    {
+      "ruleId": "COM-014",
+      "evidenceType": "direct_user_correction",
+      "evidenceRef": "资源/来源索引/2026-09-30_十店每日十SKU普货测品与BD.md",
+      "governanceStatus": "active_project",
+      "date": "2026-09-30",
+      "scope": "Current ten-store initial test exception only: ten diverse SKUs daily, same batch per store, one initial listing per SKU, daily BD brand certification"
+    },
+    {
+      "ruleId": "COM-014",
+      "evidenceType": "direct_user_instruction",
+      "evidenceRef": "资源/来源索引/2026-10-12_选品市场优先与同公司竞争纠正.md",
+      "governanceStatus": "active_project",
+      "date": "2026-10-12",
+      "scope": "ten-store selection: external opportunity primary, company success as competition; supersedes AI internal-sales promotion"
+    },
+    {
+      "ruleId": "COM-016",
+      "evidenceType": "direct_user_instruction",
+      "evidenceRef": "资源/来源索引/2026-10-10_上架产品更新必须同步飞书.md",
+      "governanceStatus": "active",
+      "date": "2026-10-10",
+      "scope": "backfill existing verified source only; no rule change"
+    },
+    {
+      "ruleId": "COM-015",
+      "evidenceType": "direct_user_correction_and_explicit_execution_update",
+      "evidenceRef": "资源/来源索引/2026-10-13_标题详情关键词与交付自检纠正.md",
+      "governanceStatus": "active",
+      "date": "2026-10-13",
+      "scope": "listing keyword comparison, purchase intent preservation, selective claim handling and self-checked bilingual delivery; no performance or platform-limit claims"
+    },
+    {
+      "ruleId": "COM-014",
+      "evidenceType": "direct_user_instruction_and_reported_execution_feedback",
+      "evidenceRef": "资源/来源索引/2026-10-16_上午工作实测与每店五链接目标.md",
+      "governanceStatus": "active_project",
+      "date": "2026-10-16",
+      "scope": "Next ten-store plans: five new listings per store daily; morning statistics and invitations reported achievable; no measured minutes or fifty-listing actuals; published Oct8-17 history retained"
+    },
+    {
+      "ruleId": "COM-014",
+      "evidenceType": "direct_user_current_scoped_override",
+      "evidenceRef": "资源/来源索引/2026-10-19_本周先上链接测流量与成交.md",
+      "governanceStatus": "active_project",
+      "date": "2026-10-19",
+      "scope": "2026-10-19..24 only: traffic-first listing test planning; market research not prerequisite; known risk and truthful product facts retained; manual publishing"
+    },
+    {
+      "ruleId": "COM-015",
+      "evidenceType": "direct_user_instruction",
+      "evidenceRef": "资源/来源索引/2026-10-19_电商工具箱增量补充授权.md",
+      "governanceStatus": "active",
+      "date": "2026-10-19",
+      "scope": "additive local tools and templates; retain existing routes; business effects unverified"
+    }
+  ],
+  "deprecatedEvidenceEntries": [
+    {
+      "ruleId": "COM-010",
+      "evidenceType": "direct_user_correction_then_superseded",
+      "evidenceRef": "task 019ffa1f-170e-7940-8b94-42e1665e0eb2 / 2026-09-02；后续被 COM-012 两表取低规则替代",
+      "governanceStatus": "deprecated"
+    }
+  ],
+  "legacyRegisterBasisOnly": [
+    "SYS-001",
+    "SYS-002",
+    "SYS-003",
+    "SYS-004",
+    "SYS-005",
+    "CNT-001",
+    "CNT-002",
+    "CNT-003",
+    "CNT-004",
+    "CNT-005",
+    "CNT-006",
+    "COM-001",
+    "COM-002",
+    "COM-003",
+    "OUT-001",
+    "DST-001",
+    "DST-002",
+    "IP-001"
+  ],
+  "legacyStatus": "covered_by_current_register_but_direct_task_or_quote_backfill_pending",
+  "automaticMutationAllowed": false
+}

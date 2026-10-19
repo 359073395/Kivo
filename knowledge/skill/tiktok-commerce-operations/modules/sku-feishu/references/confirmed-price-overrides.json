@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "policy": "Only exact SKU overrides explicitly confirmed by the user may bypass the normal requirement that both Price 1 and Price 2 are available.",
+  "overrides": [
+    {
+      "sku": "626-Expce Herbal Tea",
+      "action": "use_price2_when_price1_missing",
+      "confirmedBy": "user",
+      "confirmedAt": "2026-09-02",
+      "evidence": "User confirmed that when Price 1 is blank for this exact SKU, use Price 2 = 59,520 IDR.",
+      "latestPriceSourceDecision": "2026-10-12",
+      "currentPrice2": 55520,
+      "currentPrice2Source": "https://my.feishu.cn/sheets/PLu3smtrShVmLItIJ6nccS0knab?sheet=0hArmx",
+      "tracksVerifiedCurrentPrice2": true,
+      "latestEvidence": "User: 采用在线表格中的价格; exact SKU retains approved use_price2_when_price1_missing exception."
+    }
+  ]
+}

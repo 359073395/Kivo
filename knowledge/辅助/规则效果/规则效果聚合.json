@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-09T08:58:25.8785215Z",
+  "processedSignalIds": [
+    "27405544-5652-4aa2-bb88-fbc14c3beb1c",
+    "28a3f805-69cc-4678-b4ee-ee503e9e0354",
+    "55006c7e-a897-47a3-b019-734c92e59a36",
+    "6686c8f3-25fd-484d-9afd-cba5d4d3759b",
+    "7035d8ab-5bf7-4307-b1fc-8ec57466b100",
+    "7a501c93-d980-4532-925d-d377b81c2d26",
+    "7ea698b6-7bf8-43d6-80dd-da187859ebf5",
+    "9b7e56c9-ea01-4eb5-b6fd-ccf055d47cc8",
+    "f4fc2b2d-f9df-4c0a-a6db-07e1438b0c54"
+  ],
+  "rules": [
+    {
+      "ruleId": "COM-011",
+      "taskRefs": [
+        "019ffa1f-170e-7940-8b94-42e1665e0eb2|项目/进行中/18店在线产品与FlashDeal周更_2026-09-02.md"
+      ],
+      "effects": {
+        "changed": 0,
+        "confirmed": 0,
+        "rejected": 0,
+        "prevented_error": 1,
+        "no_material_effect": 0
+      },
+      "lastSignalAt": "09/02/2026 10:17:07",
+      "signalIds": [
+        "6686c8f3-25fd-484d-9afd-cba5d4d3759b"
+      ]
+    },
+    {
+      "ruleId": "CNT-011",
+      "taskRefs": [
+        "019fd570-28fb-7bd2-93a4-0e32121a2e10|D:\\820\\下周视频任务\\_5SKU_20260907-20260913"
+      ],
+      "effects": {
+        "changed": 1,
+        "confirmed": 0,
+        "rejected": 0,
+        "prevented_error": 0,
+        "no_material_effect": 0
+      },
+      "lastSignalAt": "09/06/2026 09:33:45",
+      "signalIds": [
+        "9b7e56c9-ea01-4eb5-b6fd-ccf055d47cc8"
+      ]
+    },
+    {
+      "ruleId": "CNT-012",
+      "taskRefs": [
+        "019fd570-28fb-7bd2-93a4-0e32121a2e10|D:\\820\\下周视频任务\\_5SKU_20260907-20260913"
+      ],
+      "effects": {
+        "changed": 0,
+        "confirmed": 0,
+        "rejected": 0,
+        "prevented_error": 1,
+        "no_material_effect": 0
+      },
+      "lastSignalAt": "09/06/2026 15:27:59",
+      "signalIds": [
+        "7035d8ab-5bf7-4307-b1fc-8ec57466b100"
+      ]
+    },
+    {
+      "ruleId": "SYS-009",
+      "taskRefs": [
+        "20260909-growth-audit|资产/报告/起店与增单全库审查_2026-09-09.md"
+      ],
+      "effects": {
+        "changed": 1,
+        "confirmed": 0,
+        "rejected": 0,
+        "prevented_error": 0,
+        "no_material_effect": 0
+      },
+      "lastSignalAt": "2026-09-09T08:58:25.7598612Z",
+      "signalIds": [
+        "28a3f805-69cc-4678-b4ee-ee503e9e0354"
+      ]
+    },
+    {
+      "ruleId": "COM-013",
+      "taskRefs": [
+        "01a02869-887e-74d2-bb71-e6ab6730d3e2|项目/进行中/17店首批46标题优化复盘_2026-09-08.md"
+      ],
+      "effects": {
+        "changed": 1,
+        "confirmed": 0,
+        "rejected": 0,
+        "prevented_error": 0,
+        "no_material_effect": 0
+      },
+      "lastSignalAt": "09/08/2026 15:09:33",
+      "signalIds": [
+        "55006c7e-a897-47a3-b019-734c92e59a36"
+      ]
+    },
+    {
+      "ruleId": "SYS-011",
+      "taskRefs": [
+        "019fd570-28fb-7bd2-93a4-0e32121a2e10|项目/进行中/20260908_五SKU50条HeyGen口播.md"
+      ],
+      "effects": {
+        "changed": 1,
+        "confirmed": 0,
+        "rejected": 0,
+        "prevented_error": 0,
+        "no_material_effect": 0
+      },
+      "lastSignalAt": "09/08/2026 15:09:33",
+      "signalIds": [
+        "7a501c93-d980-4532-925d-d377b81c2d26"
+      ]
+    },
+    {
+      "ruleId": "IP-006",
+      "taskRefs": [
+        "019fd570-28fb-7bd2-93a4-0e32121a2e10|项目/进行中/20260904_印尼下周SKU初筛.md",
+        "current-codex-task-2026-08-30"
+      ],
+      "effects": {
+        "changed": 2,
+        "confirmed": 0,
+        "rejected": 0,
+        "prevented_error": 0,
+        "no_material_effect": 0
+      },
+      "lastSignalAt": "09/04/2026 13:37:27",
+      "signalIds": [
+        "7ea698b6-7bf8-43d6-80dd-da187859ebf5",
+        "f4fc2b2d-f9df-4c0a-a6db-07e1438b0c54"
+      ]
+    },
+    {
+      "ruleId": "COM-010",
+      "taskRefs": [
+        "current-2026-09-02-flash-y-fallback-correction|项目/进行中/18店在线产品与FlashDeal周更_2026-09-02.md"
+      ],
+      "effects": {
+        "changed": 1,
+        "confirmed": 0,
+        "rejected": 0,
+        "prevented_error": 0,
+        "no_material_effect": 0
+      },
+      "lastSignalAt": "09/02/2026 08:44:38",
+      "signalIds": [
+        "27405544-5652-4aa2-bb88-fbc14c3beb1c"
+      ]
+    }
+  ]
+}

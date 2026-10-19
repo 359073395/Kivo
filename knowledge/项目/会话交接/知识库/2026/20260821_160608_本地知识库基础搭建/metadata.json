@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "title": "本地知识库基础搭建",
+  "category": "知识库",
+  "createdAt": "2026-08-21T16:06:08.8262926+07:00",
+  "status": "ready_for_restart",
+  "source": "selected-codex-conversation",
+  "rawTranscriptIncluded": false,
+  "containsSecrets": false,
+  "updatedAt": "2026-08-21T16:28:49+07:00",
+  "vaultRelativePath": "项目/会话交接/知识库/2026/20260821_160608_本地知识库基础搭建"
+}

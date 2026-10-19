@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Observable rule effect signal",
+  "type": "object",
+  "required": ["signalId", "emittedAt", "sourceClient", "taskId", "ruleId", "taskType", "effect", "observableReason", "artifactRefs", "reviewStatus"],
+  "properties": {
+    "signalId": {"type": "string", "minLength": 1},
+    "emittedAt": {"type": "string", "format": "date-time"},
+    "sourceClient": {"type": "string", "minLength": 1},
+    "taskId": {"type": "string", "minLength": 1},
+    "projectRef": {"type": ["string", "null"]},
+    "ruleId": {"type": "string", "minLength": 1},
+    "taskType": {"enum": ["fact", "execution", "judgment", "value", "mixed"]},
+    "effect": {"enum": ["changed", "confirmed", "rejected", "prevented_error", "no_material_effect"]},
+    "observableReason": {"type": "string", "minLength": 1},
+    "artifactRefs": {"type": "array", "items": {"type": "string"}},
+    "reviewStatus": {"enum": ["pending", "aggregated", "needs_human_review", "closed"]}
+  },
+  "additionalProperties": false
+}

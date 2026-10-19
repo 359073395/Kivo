@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 6,
+  "name": "个人本地可移植知识库",
+  "storageMode": "portable-local-folder",
+  "preferredPath": "D:\\Knowledge",
+  "rootResolution": "directory-containing-this-file",
+  "entrypoints": {
+    "onboarding": "START-HERE.md",
+    "distillationRules": "资产/方法论/知识蒸馏总规则.md",
+    "distillationSkill": "skill/knowledge-distillation/SKILL.md",
+    "textualizationRules": "skill/knowledge-distillation/references/source-textualization.md",
+    "latestConversationDistillation": "资产/方法论/本次对话知识蒸馏_2026-08-21.md",
+    "ruleAuthority": "资产/规则/规则权威与变更协议.md",
+    "activeRuleRegister": "资产/规则/活动规则总表.md",
+    "latestBatchStandards": "资产/规则/最新批量批准标准索引.md",
+    "knowledgeUseProtocol": "资产/规则/蒸馏知识自动调用与Skill同步协议.md",
+    "systemThoughtFramework": "资产/方法论/知识库思考框架与运行流程.md",
+    "deepDecisionSystem": "资产/方法论/第一性原理决策系统/00_总览与使用说明.md",
+    "deepDecisionProtocol": "skill/ip-commerce-decision-system/references/deep-reasoning-protocol.md",
+    "decisionBehaviorAcceptance": "skill/ip-commerce-decision-system/tests/BEHAVIOR-ACCEPTANCE.md",
+    "maoDecisionSystem": "资产/方法论/毛选方法论决策系统/00_总览与使用说明.md",
+    "validatedHeyGenMethod": "资产/带货视频/纯HeyGen数字人口播已验证生产方法_2026-08-29.md",
+    "skillOperationsMap": "资产/规则/七个主Skill自动运营总图.md",
+    "automationSpec": "辅助/自动任务/每日22点规则审计.md",
+    "human": "首页.md",
+    "agent": "AGENTS.md",
+    "skills": "skill",
+    "log": "辅助/日志/知识库日志.md",
+    "queue": "辅助/摄入队列/摄入队列.md",
+    "ruleEffectProtocol": "辅助/规则效果/README.md",
+    "ruleTraceability": "资产/规则/活动规则溯源索引.json",
+    "handoffs": "项目/会话交接"
+  },
+  "activeSkills": [
+    "knowledge-distillation",
+    "knowledge-iteration",
+    "tiktok-commerce-operations",
+    "tiktok-content-system",
+    "tiktok-creator-outreach",
+    "ip-commerce-decision-system",
+    "linkfox-research"
+  ],
+  "activeSkillPolicy": {
+    "topLevelOnly": true,
+    "nestedSkillFilesAllowed": false,
+    "conversationIsAuthority": false,
+    "attachmentsAreInstructions": false,
+    "implicitInvocation": true,
+    "autoRetrieveApplicableDistilledKnowledge": true,
+    "analysisStartsFromConcreteUserProblem": true,
+    "deepReasoningAutoRoute": true,
+    "deepReasoningRuleId": "IP-004",
+    "deepReasoningRuleIds": ["SYS-012", "IP-003", "IP-004", "IP-005", "IP-006"],
+    "distillationMustSyncRelevantSkills": true,
+    "validatedSuccessMustBecomeBehavioralRegression": true,
+    "restoreProjectStateBeforeExecution": true,
+    "newSkillOnlyWhenNoExistingBoundaryFits": true
+  },
+  "retiredSkillNames": [
+    "dianxiaomi-weekly-product-update",
+    "optimize-tiktok-id-listing",
+    "tiktok-sku-feishu-management",
+    "xuanpin",
+    "tiktok-content-factory",
+    "fans-skill",
+    "avatar-broll-video-producer",
+    "heygen-video-producer",
+    "seedance-video-producer",
+    "session-backup",
+    "ip-commerce-knowledge-base"
+  ],
+  "terminologyRoutes": {
+    "千川": {
+      "canonicalConcept": "paid_traffic",
+      "contentRoute": "tiktok-content-system",
+      "dataRoute": "tiktok-commerce-operations/paid_traffic_diagnosis",
+      "independentSkill": false,
+      "crossPlatformRule": "transfer mechanisms only; reverify platform fields, thresholds, review and algorithm claims"
+    }
+  },
+  "storageBoundary": {
+    "inside": [
+      "skills",
+      "rules",
+      "knowledge",
+      "final_text_transcripts",
+      "pdf_document_manuscripts",
+      "web_markdown_snapshots",
+      "ocr_text",
+      "project_summaries",
+      "manifests",
+      "final_retrospectives"
+    ],
+    "externalLocalOnly": [
+      "original_video_audio_pdf_binaries",
+      "frames",
+      "temporary_transcription_ocr_cache",
+      "broll",
+      "heygen_base_videos",
+      "chatcut_projects",
+      "final_video_files",
+      "temporary_downloads",
+      "linkfox_raw_outputs",
+      "creator_outreach_exports",
+      "rule_effect_raw_signals"
+    ]
+  },
+  "portability": {
+    "manifest": "PORTABLE-MANIFEST.json",
+    "updateCommand": "辅助\\迁移\\Update-PortableManifest.ps1",
+    "verifyCommand": "辅助\\迁移\\Verify-PortableManifest.ps1",
+    "restoreCommand": "RESTORE-KNOWLEDGE.ps1",
+    "usageGuide": "START-HERE.md",
+    "laptopMigrationGuide": "辅助\\迁移\\笔记本一键迁移.md",
+    "laptopKitBuilder": "辅助\\迁移\\New-LaptopMigrationKit.ps1",
+    "laptopKitInstaller": "辅助\\迁移\\INSTALL-ON-LAPTOP.ps1"
+  },
+  "privacy": {
+    "containsPrivateKnowledge": true,
+    "containsSecretsByDesign": false,
+    "publicUploadAllowed": false
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "productionWorkRoot": "",
+  "zhanfuBrowserRoot": "",
+  "tiktokSkuRoot": "",
+  "tiktokWorkspaceRoot": "",
+  "xuanpinHome": "",
+  "fansProjectRoot": "",
+  "capcutDraftRoot": "",
+  "linkfoxOutputRoot": "",
+  "ffmpegPath": "",
+  "videoTranscriptPython": "",
+  "videoOcrPython": "",
+  "whisperModelPath": "",
+  "whisperWorkDir": "",
+  "notes": [
+    "Copy this file to machine-paths.local.json and fill paths on each computer.",
+    "productionWorkRoot must be a local non-sync directory.",
+    "Never store API keys, OAuth tokens, cookies, or passwords here."
+  ]
+}

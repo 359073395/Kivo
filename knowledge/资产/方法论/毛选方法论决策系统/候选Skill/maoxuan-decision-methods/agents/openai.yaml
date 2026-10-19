@@ -1,0 +1,7 @@
+interface:
+  display_name: "毛选方法论决策系统（候选）"
+  short_description: "用调查、矛盾、阶段与实践回路做可检验决策"
+  default_prompt: "Use $maoxuan-decision-methods to analyze this decision with evidence, stages, checks, and stop conditions."
+policy:
+  allow_implicit_invocation: false
+

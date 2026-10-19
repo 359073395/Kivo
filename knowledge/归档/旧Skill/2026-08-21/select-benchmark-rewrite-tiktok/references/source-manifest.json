@@ -1,0 +1,47 @@
+{
+  "bundle_name": "select-benchmark-rewrite-tiktok",
+  "bundle_version": "2026-08-12",
+  "product_knowledge": {
+    "file": "product/Y仓全部SKU产品资料与促销总表_20260808.xlsx",
+    "sha256": "22C30FDFEC273D266CCC304C5E79CB46E0648478EA20D64EAC070F6EEB112F60",
+    "snapshot_date": "2026-08-08",
+    "sku_count": 571,
+    "price_fields": [
+      "listing_original_price_idr",
+      "daily_price_idr",
+      "activity_price_idr"
+    ],
+    "search_index": "product/product_catalog.jsonl"
+  },
+  "operations_knowledge": {
+    "file": "operations/Tiktok从入门到精通.docx",
+    "sha256": "6722A19DA60CDA982A40CFEB5DCC688C31D110F56669930DB0F7E2D05E2816E3",
+    "received_at": "2026-08-12",
+    "search_index": "operations/tiktok-operations-extracted.md"
+  },
+  "selection_logic": {
+    "canonical_snapshot": "selection/selection-logic.md",
+    "distilled_from": [
+      "xuanpin conversation-context.md",
+      "xuanpin workflow-and-rules.md",
+      "SKU_TEST_RULES.md",
+      "selection-system scoring.js and qualityGate.js"
+    ],
+    "note": "Original backups with machine-specific paths and historical account state are intentionally not bundled."
+  },
+  "viral_library": {
+    "folder": "viral-library",
+    "files": [
+      "01_tiktok_foundation_rules.md",
+      "02_indonesia_copy_generation_playbook.md",
+      "03_viral_copy_patterns_from_batch_20260610.md",
+      "viral_reference_database.md"
+    ]
+  },
+  "images": {
+    "folder": "../assets/product-thumbnails",
+    "count": 571,
+    "note": "Portable thumbnails only; full-resolution originals remain outside the bundle."
+  },
+  "official_policy_checked_at": "2026-08-12"
+}

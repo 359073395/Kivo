@@ -1,0 +1,142 @@
+{
+  "format": "maoxuan-decision-method-cards-v2",
+  "status": "candidate_validated_not_active",
+  "sourcePolicy": {
+    "original": "1991年四卷扫描稿用于原著归属和页码；锚点分别记录OCR页标、印刷页码和核验状态",
+    "interpretation": "Word和课程视频属于解释层，不得冒充原著",
+    "migration": "现代执行结构属于现代编译或AI迁移，必须单独标记并带边界和停止条件",
+    "currentFacts": "当前法律、平台、安全、财务和业务事实优先于历史类比",
+    "sourceCard": "资源/来源索引/2026-08-24_毛选综合资料来源卡.md"
+  },
+  "provenanceAxes": {
+    "provenance": "字段的出身",
+    "verification": "来源核验到什么程度",
+    "governanceStatus": "是否具有执行权",
+    "pageSystem": ["ocrPageMarkers", "printedPages"]
+  },
+  "cards": [
+    {
+      "id": "M01", "title": "调查先于判断", "trigger": "关键说法陈旧、二手、模糊或相互冲突",
+      "inputs": ["决策问题", "当前事实", "历史事实", "来源与时间", "关键未知"],
+      "actions": ["定义问题", "调查当前与历史", "记录来源时间和例外", "分开观察与解释"],
+      "checks": ["证据表可复现", "关键未知能改变选项"], "stopConditions": ["关键未知低于预设阈值", "继续调查成本高于可逆试点"],
+      "failureModes": ["材料越积越多但不改变任何决策变量"],
+      "fieldProvenance": {
+        "coreMechanism": {"provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only"},
+        "trigger_inputs_actions_checks_stopConditions_failureModes": {"provenance": "modern_compilation", "verification": "not_applicable", "governanceStatus": "candidate_validated_not_active"}
+      },
+      "sourceAnchors": [
+        {"anchorId": "M01-A1", "source": "毛选1_fulltext.md", "ocrPageMarkers": "122-131", "printedPages": "109-118", "provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only", "supports": ["M01"]},
+        {"anchorId": "M01-A2", "source": "毛选3_fulltext.md", "ocrPageMarkers": "19-22", "printedPages": "799-802", "provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only", "supports": ["M01", "M03"]}
+      ]
+    },
+    {
+      "id": "M02", "title": "实践—认识循环", "trigger": "想法合理但在当前场景没有验证",
+      "inputs": ["观察", "候选假设", "替代解释", "可测指标"],
+      "actions": ["从观察归纳规律候选", "检查样本和反例", "从候选及其大前提演绎事前预测", "运行最小安全测试", "比较预期与实际", "用新样本修正前提与认识"],
+      "checks": ["预测在结果前固定", "替代解释未被删除"], "stopConditions": ["安全受损", "测量失效", "触及预设失败线"],
+      "failureModes": ["结果后改写预测", "把任何意外都解释为阶段变化"],
+      "fieldProvenance": {
+        "coreMechanism": {"provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only"},
+        "trigger_inputs_actions_checks_stopConditions_failureModes": {"provenance": "modern_compilation", "verification": "not_applicable", "governanceStatus": "candidate_validated_not_active"}
+      },
+      "sourceAnchors": [{"anchorId": "M02-A1", "source": "毛选1_fulltext.md", "ocrPageMarkers": "304-309", "printedPages": "291-296", "provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only", "supports": ["M02", "M09"]}]
+    },
+    {
+      "id": "M03", "title": "防教条与防经验主义", "trigger": "准备照抄书本、课程、竞品或一次成功经验",
+      "inputs": ["来源方法", "来源条件", "当前条件", "反例", "领域知识", "实操方法", "本案调查事实"],
+      "actions": ["比较条件", "区分不变量和变化项", "寻找独立反例", "只迁移机制", "检查一般框架、领域知识、实操方法和本案事实是否齐全"],
+      "checks": ["理由不是书里说", "理由不是上次有效"], "stopConditions": ["条件匹配后没有留下可迁移机制"],
+      "failureModes": ["把外部结论当模板", "把局部经验当普遍规律"],
+      "fieldProvenance": {
+        "coreMechanism": {"provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only"},
+        "trigger_inputs_actions_checks_stopConditions_failureModes": {"provenance": "modern_compilation", "verification": "not_applicable", "governanceStatus": "candidate_validated_not_active"}
+      },
+      "sourceAnchors": [{"anchorId": "M03-A1", "source": "毛选3_fulltext.md", "ocrPageMarkers": "19-39", "printedPages": "799-819", "provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only", "supports": ["M01", "M03"]}]
+    },
+    {
+      "id": "M04", "title": "矛盾与优先级", "trigger": "多个问题争夺有限资源",
+      "inputs": ["问题清单", "相互作用两面", "影响", "紧迫性", "可控性", "证据", "依赖"],
+      "actions": ["定义各问题性质", "列候选主要矛盾", "比较排序", "选择一个当前优先级", "定义反转信号"],
+      "checks": ["说明第二名为何不是第一", "灾难性次要风险仍受监控"], "stopConditions": ["硬门禁失败", "证据无法区分候选"],
+      "failureModes": ["用主要矛盾忽略安全合规现金流", "把优先级当永久真理"],
+      "fieldProvenance": {
+        "coreMechanism": {"provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only"},
+        "trigger_inputs_actions_checks_stopConditions_failureModes": {"provenance": "modern_compilation", "verification": "not_applicable", "governanceStatus": "candidate_validated_not_active"}
+      },
+      "sourceAnchors": [
+        {"anchorId": "M04-A1", "source": "毛选1_fulltext.md", "ocrPageMarkers": "324-339", "printedPages": "311-326", "provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only", "supports": ["M04", "M05"]},
+        {"anchorId": "M04-A2", "source": "毛选2_fulltext.md", "ocrPageMarkers": "195-196", "printedPages": "525-526", "provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only", "supports": ["M04"]}
+      ]
+    },
+    {
+      "id": "M05", "title": "阶段战略", "trigger": "目标不能一步实现或条件持续变化",
+      "inputs": ["自身能力", "相关方行为", "资源", "时间", "外部约束", "真实需求", "竞争", "合规", "履约", "现金流"],
+      "actions": ["把趋势、需求、优势仅作检查问题", "识别可控的缺失条件", "比较力量与条件", "划分阶段", "每阶段确定中心任务", "设置进入退出和转段信号"],
+      "checks": ["阶段目的不同", "有复盘日期和损失上限"], "stopConditions": ["目标失效", "成本超上限", "阶段信号连续失败"],
+      "failureModes": ["用长期主义掩盖沉没成本", "阶段只有名字没有不同动作"],
+      "fieldProvenance": {
+        "coreMechanism": {"provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only"},
+        "trigger_inputs_actions_checks_stopConditions_failureModes": {"provenance": "modern_compilation", "verification": "not_applicable", "governanceStatus": "candidate_validated_not_active"}
+      },
+      "sourceAnchors": [{"anchorId": "M05-A1", "source": "毛选2_fulltext.md", "ocrPageMarkers": "109-147", "printedPages": "439-477", "provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only", "supports": ["M05"]}]
+    },
+    {
+      "id": "M06", "title": "个别试点—一线回路", "trigger": "一般方案需要在实际执行中验证",
+      "inputs": ["一般目标", "代表性样本", "一线观察", "负责人", "事前成功阈值", "衰减信号"],
+      "actions": ["选择小试点", "预先写成功阈值", "收集一线意见", "集中成具体方案", "返回一线重复检验", "有上限地扩展"],
+      "checks": ["记录样本偏差", "区分重复规律与单次偶然", "规模化条件匹配"], "stopConditions": ["试点伤害", "反馈不可用", "规模化条件不同", "效果衰减越过预设线"],
+      "failureModes": ["一般号召无负责人", "把响亮少数当整体"],
+      "fieldProvenance": {
+        "coreMechanism": {"provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only"},
+        "trigger_inputs_actions_checks_stopConditions_failureModes": {"provenance": "modern_compilation", "verification": "not_applicable", "governanceStatus": "candidate_validated_not_active"}
+      },
+      "sourceAnchors": [{"anchorId": "M06-A1", "source": "毛选3_fulltext.md", "ocrPageMarkers": "117-121", "printedPages": "897-901", "provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only", "supports": ["M06"]}]
+    },
+    {
+      "id": "M07", "title": "合作中的自主性", "trigger": "平台、达人、供应商、工具或伙伴可以加速目标",
+      "inputs": ["共同目标", "边界", "贡献", "决策权", "数据资产", "替代方案"],
+      "actions": ["接触并相互了解", "确认互惠价值但不预设信任", "定义共同目标", "写非谈判边界", "约定数据资产归属", "设复盘与退出计划"],
+      "checks": ["核心数据关系能力仍自有", "存在可行替代"], "stopConditions": ["边界被突破", "依赖超上限", "过程不可审计"],
+      "failureModes": ["把合作等同放弃控制", "把自力更生等同拒绝外援"],
+      "fieldProvenance": {
+        "coreMechanism": {"provenance": "original_core", "verification": "mixed_ocr_and_original_scan_review", "governanceStatus": "evidence_only"},
+        "trigger_inputs_actions_checks_stopConditions_failureModes": {"provenance": "modern_compilation", "verification": "not_applicable", "governanceStatus": "candidate_validated_not_active"}
+      },
+      "sourceAnchors": [
+        {"anchorId": "M07-A1", "source": "毛选2_fulltext.md", "ocrPageMarkers": "24,37,48-49", "printedPages": "354,367,378-379", "provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only", "supports": ["M07"]},
+        {"anchorId": "M07-A2", "source": "毛选3_fulltext.md", "ocrPageMarkers": "236", "printedPages": "1016", "provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only", "supports": ["M07"]},
+        {"anchorId": "M07-A3-OLD", "source": "毛选4_fulltext.md", "ocrPageMarkers": "26", "printedPages": "1136", "provenance": "original_core", "verification": "incorrect_anchor", "governanceStatus": "deprecated_evidence", "supports": [], "replacedBy": "M07-A3"},
+        {"anchorId": "M07-A3", "source": "毛选4_fulltext.md", "ocrPageMarkers": "22-23", "printedPages": "1132-1133", "provenance": "original_core", "verification": "original_scan_reviewed", "governanceStatus": "evidence_only", "supports": ["M07"], "reviewedAt": "2026-08-30"}
+      ]
+    },
+    {
+      "id": "M08", "title": "集中有限资源", "trigger": "主要矛盾已确认但资源仍分散",
+      "inputs": ["决定性瓶颈", "可用资源", "硬门禁储备", "突破指标", "重复验证阈值"],
+      "actions": ["保留门禁容量", "有上限地集中多数资源", "测试单一突破点", "阈值重复通过后才扩大", "冻结低价值旁支"],
+      "checks": ["分配有证据", "尽量可逆", "保留储备"], "stopConditions": ["瓶颈判断被推翻", "领先指标越线", "出现系统性风险"],
+      "failureModes": ["照搬军事动作", "无储备地孤注一掷"],
+      "fieldProvenance": {
+        "coreMechanism": {"provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only"},
+        "trigger_inputs_actions_checks_stopConditions_failureModes": {"provenance": "modern_compilation", "verification": "not_applicable", "governanceStatus": "candidate_validated_not_active"}
+      },
+      "sourceAnchors": [{"anchorId": "M08-A1", "source": "毛选4_fulltext.md", "ocrPageMarkers": "87-91", "printedPages": "1197-1201", "provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only", "supports": ["M08"]}]
+    },
+    {
+      "id": "M09", "title": "纠错复盘", "trigger": "结果落后、超预期或出现副作用",
+      "inputs": ["事前预测", "实际结果", "执行记录", "环境变化", "反证"],
+      "actions": ["预期对实际", "区分诊断执行测量环境", "邀请反证", "定义下一轮可证伪修改"],
+      "checks": ["不用责备标签替代因果", "单次结果只形成候选经验"], "stopConditions": ["下一步可检验变化已定义", "项目触发止损"],
+      "failureModes": ["事后诸葛亮", "把自我批评变成羞辱或仪式"],
+      "fieldProvenance": {
+        "practice_feedback_core": {"provenance": "original_core", "verification": "mixed_ocr_and_original_scan_review", "governanceStatus": "evidence_only"},
+        "diagnosis_execution_measurement_environment_split": {"provenance": "modern_compilation", "verification": "not_applicable", "governanceStatus": "candidate_validated_not_active"},
+        "trigger_inputs_actions_checks_stopConditions_failureModes": {"provenance": "modern_compilation", "verification": "not_applicable", "governanceStatus": "candidate_validated_not_active"}
+      },
+      "sourceAnchors": [
+        {"anchorId": "M09-A1", "source": "毛选1_fulltext.md", "ocrPageMarkers": "304-309", "printedPages": "291-296", "provenance": "original_core", "verification": "ocr_located_original_pending", "governanceStatus": "evidence_only", "supports": ["M02", "M09"]},
+        {"anchorId": "M09-A2", "source": "毛选3_fulltext.md", "ocrPageMarkers": "316-317", "printedPages": "1096-1097", "provenance": "original_core", "verification": "original_scan_reviewed", "governanceStatus": "evidence_only", "supports": ["M09"], "reviewedAt": "2026-08-30"}
+      ]
+    }
+  ]
+}

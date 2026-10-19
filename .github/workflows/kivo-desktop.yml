@@ -1,0 +1,35 @@
+name: Kivo desktop installer
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+      - name: Prepare core runtime
+        shell: pwsh
+        run: |
+          python -m venv .venv
+          ./.venv/Scripts/python.exe -m pip install -r requirements-desktop.txt
+          npm ci --prefix web/frontend
+          npm run build --prefix web/frontend
+          npm ci --prefix desktop
+          ./desktop/Prepare-Python.ps1
+          node desktop/prepare.cjs
+          npm test --prefix desktop
+          npm run build --prefix desktop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Kivo-Windows-installer
+          path: |
+            desktop/dist/Kivo-Setup-*.exe
+            desktop/dist/*.blockmap
+            desktop/dist/latest.yml

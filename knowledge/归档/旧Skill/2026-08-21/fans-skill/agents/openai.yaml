@@ -1,0 +1,4 @@
+interface:
+  display_name: "fans Skill"
+  short_description: "Indonesian follower-growth CapCut workflow"
+  default_prompt: "Use $fans-skill to turn this viral reference into 10 original Indonesian follower-growth CapCut drafts."

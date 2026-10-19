@@ -1,0 +1,6 @@
+interface:
+  display_name: "TikTok 内容生产系统"
+  short_description: "涨粉、投流素材、仿写、HeyGen、B-roll 与 ChatCut"
+  default_prompt: "Use $tiktok-content-system to choose the correct content mode, automatically apply relevant active distilled methods, and continue from local task state."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,10 @@
+{
+  "name": "Kivo · 创作工作台",
+  "edition": "domestic",
+  "version": "0.3.0",
+  "upstream": "https://github.com/ZJU-REAL/Easel",
+  "upstreamCommit": "8d08b216105bd7c7057c84c97cd637cec44db609",
+  "upstreamVersion": "0.3.0",
+  "scope": "保留原平台功能，增加反馈自学习、手动知识和通用API独立工具引擎",
+  "overseas": "awaiting_user_design"
+}

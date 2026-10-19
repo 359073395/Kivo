@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "brief_id": "",
+  "version": "",
+  "identity": {"sku": "", "market": "ID", "platform": "tiktok_shop"},
+  "listing_targets": [],
+  "number_locale": "id-ID",
+  "sources": [],
+  "facts": [],
+  "core_selling_point": {"text": "", "fact_ids": []},
+  "forbidden_words": {"reviewed": false, "items": []},
+  "known_risks": [],
+  "real_assets": [],
+  "deliverables": {"title": "", "description": "", "image_text": "", "video_script": ""},
+  "required_keywords": [],
+  "title_constraint": null,
+  "numeric_bindings": [],
+  "claim_checks": []
+}

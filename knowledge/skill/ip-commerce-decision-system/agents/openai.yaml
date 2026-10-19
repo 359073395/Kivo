@@ -1,0 +1,6 @@
+interface:
+  display_name: "IP 与电商决策系统"
+  short_description: "用蒸馏经验做定位、内容、带货与复盘决策"
+  default_prompt: "Use $ip-commerce-decision-system on the user's concrete problem. For every judgment or choice, run both fixed filters internally on the same facts: stage, main contradiction and pace; a no-proper-noun equation, leverage variable, boundary constant, and at least two hidden assumptions labeled only 可承受风险 or 致命风险. In normal answers, do not show framework/course names, filter headings or the fixed checklist. State what to do and naturally explain why, the relevant evidence and risk, how to verify, and when to stop or change direction. Reveal the internal structure only when the user explicitly asks for framework, source-trace or audit detail. For deep decisions, also use the fused feedback loop, hard gates, stop conditions and writeback."
+policy:
+  allow_implicit_invocation: true

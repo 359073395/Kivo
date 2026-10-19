@@ -1,0 +1,4 @@
+interface:
+  display_name: "Seedance Video Producer"
+  short_description: "Run and resume serial Seedance image-to-video tasks safely"
+  default_prompt: "Use $seedance-video-producer to test the first Seedance task from my chosen task folder."

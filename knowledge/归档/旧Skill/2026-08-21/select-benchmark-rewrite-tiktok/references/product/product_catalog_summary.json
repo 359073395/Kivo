@@ -1,0 +1,9 @@
+{
+  "record_count": 571,
+  "source_workbook": "Y仓全部SKU产品资料与促销总表_20260808.xlsx",
+  "source_sheet": "Y仓SKU产品资料总表",
+  "sku_unique_count": 571,
+  "thumbnail_reference_count": 571,
+  "notice": "The string 37 in descriptive fields is normalized to null because it is a source placeholder, not a product fact.",
+  "fact_layer_notice": "Listing original price, daily price, activity price, discounts, COD and mappings are dated snapshots; descriptive listing fields remain unverified evidence and claim risks are tagged."
+}

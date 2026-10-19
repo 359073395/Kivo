@@ -1,0 +1,4 @@
+interface:
+  display_name: "TikTok Creator Outreach"
+  short_description: "免费读取 TikTok CSV/XLSX，筛选评分并生成复核与邀约草稿"
+  default_prompt: "Use $tk-creator-outreach to process my authorized TikTok creator CSV/XLSX locally, auto-map headers, create standard/deep review queues, and prepare original-aligned pending-review outreach drafts without paid data APIs or sending anything."

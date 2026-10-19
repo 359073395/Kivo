@@ -1,0 +1,4 @@
+interface:
+  display_name: "TikTok 选品对标爆款仿写"
+  short_description: "基于SKU知识库完成选品、对标筛选、结构拆解与印尼语原创仿写"
+  default_prompt: "使用 $select-benchmark-rewrite-tiktok，基于产品事实完成选品、查找对标、拆解爆款结构，并输出合规的印尼语原创仿写。"

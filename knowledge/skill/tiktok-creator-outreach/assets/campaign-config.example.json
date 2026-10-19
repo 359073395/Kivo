@@ -1,0 +1,59 @@
+{
+  "version": "3.0",
+  "scoring_model_approved": false,
+  "campaign_name": "US Beauty Creator Test",
+  "brand": "Example Brand",
+  "product_name": "Hydrating Lip Treatment",
+  "product_category": "Beauty / Lip Care",
+  "market": "US",
+  "languages": ["en"],
+  "campaign_goal": "Find evidence-backed creators for a small-scale affiliate test",
+  "one_sentence_value": "A comfortable daily lip treatment designed to support a hydrated-looking finish.",
+  "selling_points": [
+    {"claim": "Comfortable daily texture", "evidence": "Internal product texture test; wording must be approved before use"},
+    {"claim": "Easy routine integration", "evidence": "Product can be demonstrated as one step in a lip-care routine"},
+    {"claim": "Portable format", "evidence": "Confirmed package dimensions"}
+  ],
+  "target_customer": "US adults interested in practical beauty routines",
+  "use_cases": ["daily lip-care routine", "before makeup", "on-the-go reapplication"],
+  "price": "unknown",
+  "discount": "unknown",
+  "commission_pct": 15,
+  "sample_policy": "Available only after manual approval and address eligibility check",
+  "sample_quantity": "unknown",
+  "paid_budget": "unknown",
+  "deliverables": "To be confirmed with each creator",
+  "content_directions": ["real routine demonstration", "texture and application", "honest use experience"],
+  "assets_support": ["product factsheet", "approved product images"],
+  "usage_rights": "unknown",
+  "spark_ads_support": "unknown",
+  "approved_claims": ["hydrated-looking finish", "daily lip-care routine"],
+  "prohibited_claims": ["medical or therapeutic claims", "guaranteed sales or earnings", "unapproved superlatives"],
+  "contact_person": "Campaign team",
+  "reply_timezone": "America/Los_Angeles",
+  "confirmation_process": "All offers and outbound messages require manual approval",
+  "hard_filters": {
+    "min_followers": 1000,
+    "max_followers": 1000000,
+    "max_days_since_last_post": 90,
+    "require_contact": false,
+    "exclude_high_risk": true,
+    "commission_is_hard_limit": true,
+    "cash_fee_is_hard_limit": false,
+    "max_commission_pct": 20,
+    "max_cash_fee": 500
+  },
+  "funnel": {
+    "standard_review_limit": 100,
+    "deep_review_limit": 40,
+    "notes": "Adjust to team capacity; deep review is normally 30-50 creators."
+  },
+  "offer": {
+    "confirmed": false,
+    "sample": "subject to manual approval",
+    "commission": "up to the approved campaign limit",
+    "cash_fee": "not confirmed",
+    "shipping_regions": ["US"],
+    "notes": "Do not insert unconfirmed amounts or guarantees into outreach."
+  }
+}

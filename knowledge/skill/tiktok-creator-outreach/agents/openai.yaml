@@ -1,0 +1,7 @@
+interface:
+  display_name: "TikTok 达人建联"
+  short_description: "本地筛选达人、证据复核并生成未发送草稿"
+  default_prompt: "Use $tiktok-creator-outreach to screen this creator export and prepare evidence-backed NOT_SENT outreach drafts."
+policy:
+  allow_implicit_invocation: true
+

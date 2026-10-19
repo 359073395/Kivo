@@ -1,0 +1,7 @@
+interface:
+  display_name: "LinkFox 跨境调研"
+  short_description: "调用外部跨境数据工具，为本地决策提供证据"
+  default_prompt: "Use $linkfox-research to collect dated cross-border evidence and return it to the relevant local decision workflow."
+policy:
+  allow_implicit_invocation: true
+

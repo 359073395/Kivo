@@ -1,0 +1,4 @@
+interface:
+  display_name: "店小秘每周产品库更新"
+  short_description: "每周同步店小秘全部在线产品，安全覆盖现有店铺产品表并汇总变化"
+  default_prompt: "使用 $dianxiaomi-weekly-product-update 更新全部现有店铺的在线产品库、汇总变化，并通知指定任务继续填写 Flash Deal.xlsx。"

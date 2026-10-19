@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "matchingPolicy": "Only these user-confirmed exact source-specific aliases may bypass exact SKU text equality. Never generalize whitespace removal or I/l substitution.",
+  "aliases": [
+    {"storeSku":"Face LIFT01= Pink FAY","warehouseSku":"Face LIFT01=Pink FAY","confirmedBy":"user","confirmedAt":"2026-09-14","evidenceRef":"../../../../../资源/来源索引/2026-09-14_两项仓库SKU别名确认.md"},
+    {"storeSku":"NUGEN BIoom","warehouseSku":"NUGEN Bloom","confirmedBy":"user","confirmedAt":"2026-09-14","evidenceRef":"../../../../../资源/来源索引/2026-09-14_两项仓库SKU别名确认.md"}
+  ]
+}

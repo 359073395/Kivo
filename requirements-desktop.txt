@@ -1,0 +1,16 @@
+# Reproducible core desktop runtime. Heavy media backends remain optional.
+fastapi==0.147.0
+uvicorn==0.54.0
+sse-starlette==3.5.0
+httpx==0.28.1
+python-multipart==0.0.32
+pydantic==2.14.1
+cryptography==50.0.2
+websocket-client==1.9.2
+python-dotenv==1.2.4
+Markdown==3.11.1
+pillow==13.0.0
+requests==2.34.2
+beautifulsoup4==4.15.0
+segno==1.6.6
+playwright==1.64.0

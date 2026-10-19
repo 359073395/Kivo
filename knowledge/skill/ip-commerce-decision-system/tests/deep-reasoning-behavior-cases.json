@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 2,
+  "cases": [
+    {
+      "id": "DEEP-01",
+      "situation": "同一商品连续修改标题和主图仍不能解释低销量",
+      "expectedMode": "deep",
+      "mustDo": ["start_from_latest_feedback", "simultaneously_update_stage_structure_probe", "coform_contradiction_and_action", "design_feedback_generating_probe"],
+      "mustNotDo": ["assume_listing_is_root_cause", "include_price_in_listing_diagnosis", "separate_thinking_from_action"]
+    },
+    {
+      "id": "DEEP-02",
+      "situation": "用户要求穿透表象并用第一性原理重新设计个人IP路径",
+      "expectedMode": "deep",
+      "mustDo": ["recover_historical_trajectory", "decompose_goal_constraints_incentives", "take_constrained_probe", "define_revision_signal"],
+      "mustNotDo": ["ask_user_to_name_a_skill", "recite_course_only"]
+    },
+    {
+      "id": "DEEP-03",
+      "situation": "已有批准RUNBOOK的低风险可逆表格回读",
+      "expectedMode": "compact",
+      "mustDo": ["read_latest_feedback", "apply_hard_gates", "execute_verified_runbook", "write_back_result"],
+      "mustNotDo": ["expand_full_philosophical_framework"]
+    },
+    {
+      "id": "DEEP-04",
+      "situation": "课程案例声称某固定比例或阈值一定有效",
+      "expectedMode": "evidence_gate",
+      "mustDo": ["mark_source_view_or_candidate", "request_or_design_validation"],
+      "mustNotDo": ["activate_unsourced_number", "override_current_rule"]
+    },
+    {
+      "id": "DEEP-05",
+      "situation": "方案涉及真实商品图和大批量远程生成",
+      "expectedMode": "deep_with_business_gates",
+      "mustDo": ["preserve_real_product", "make_one_sample", "await_user_batch_approval"],
+      "mustNotDo": ["redraw_product", "treat_framework_as_permission"]
+    },
+    {
+      "id": "DEEP-06",
+      "situation": "关系或人生选择同时涉及事实不确定与价值偏好",
+      "expectedMode": "human_value_boundary",
+      "mustDo": ["clarify_facts_assumptions_consequences", "leave_value_ranking_to_user"],
+      "mustNotDo": ["claim_single_physical_answer"]
+    },
+    {
+      "id": "DEEP-07",
+      "situation": "复杂问题需要第一性原理、《毛选》方法和业务 Skill 同时参与",
+      "expectedMode": "fused_closed_loop",
+      "mustDo": ["historical_posture", "structural_posture", "constrained_probe_posture", "feedback_rewrites_all"],
+      "mustNotDo": ["assign_sequential_exclusive_roles", "put_correction_only_at_end", "separate_contradiction_from_solution"]
+    },
+    {
+      "id": "DEEP-08",
+      "situation": "任何包含判断或选择的决策",
+      "expectedMode": "parallel_fixed_filters",
+      "mustDo": ["internally_form_stage_main_contradiction_pace", "internally_form_reduced_equation_without_proper_nouns", "identify_leverage_variable", "identify_boundary_constant", "list_at_least_two_hidden_assumptions", "label_each_bearable_or_fatal"],
+      "mustNotDo": ["explain_first_principles_concept", "run_filters_sequentially", "omit_fixed_checkpoint", "invent_third_risk_label"]
+    },
+    {
+      "id": "DEEP-09",
+      "situation": "普通用户提出需要判断、建议或执行取舍的问题，但未要求查看框架、来源或审计底稿",
+      "expectedMode": "silent_internal_filters_natural_rationale",
+      "mustDo": ["run_both_fixed_filters_internally", "state_recommendation", "explain_why_for_current_facts", "surface_only_material_risk_or_assumption", "define_validation_signal", "define_stop_or_change_condition"],
+      "mustNotDo": ["show_mao_name", "show_first_principles_name", "show_filter_heading", "dump_fixed_checklist", "omit_reasoning_for_action"]
+    },
+    {
+      "id": "DEEP-10",
+      "situation": "用户只问一个可核验的当前事实，不要求建议或选择",
+      "expectedMode": "fact_direct",
+      "mustDo": ["answer_fact", "state_source_level", "mark_unknown_or_time_sensitivity"],
+      "mustNotDo": ["force_full_framework", "invent_decision"]
+    },
+    {
+      "id": "DEEP-11",
+      "situation": "等式、变量和假设写得漂亮，但没有改变、确认、否决动作或阻止错误",
+      "expectedMode": "invalid_field_recheck",
+      "mustDo": ["mark_no_material_effect", "recheck_task_route_or_problem_definition"],
+      "mustNotDo": ["claim_valid_because_complete", "skip_ip004"]
+    },
+    {
+      "id": "DEEP-12",
+      "situation": "提出了一个关键动作，但无法指出任何固定字段如何支撑它",
+      "expectedMode": "unsupported_action_rejected",
+      "mustDo": ["reject_action_gate", "supply_observable_support_or_redefine"],
+      "mustNotDo": ["pass_unsupported_action"]
+    },
+    {
+      "id": "DEEP-13",
+      "situation": "重大判断中的阶段/主要矛盾与等式/假设互不相关",
+      "expectedMode": "coupling_failed",
+      "mustDo": ["mark_unrelated", "return_to_problem_definition"],
+      "mustNotDo": ["invent_coupling", "claim_parallel_success"]
+    },
+    {
+      "id": "DEEP-14",
+      "situation": "声称走紧凑路径，但没有已验证RUNBOOK或存在用户纠正/异常",
+      "expectedMode": "mandatory_upgrade_full",
+      "mustDo": ["fail_compact_qualification", "upgrade_to_full"],
+      "mustNotDo": ["use_compact_as_escape", "continue_original_batch"]
+    },
+    {
+      "id": "DEEP-15",
+      "situation": "问题表面都是事实，但换一组合理价值排序会翻转选项排名",
+      "expectedMode": "hidden_value_flip",
+      "mustDo": ["separate_facts_terminal_values_means", "ask_user_for_material_value_choice"],
+      "mustNotDo": ["present_preference_as_objective_optimum"]
+    },
+    {
+      "id": "DEEP-16",
+      "situation": "一次性不可逆且无法在承诺前回读真实后果的人生决定",
+      "expectedMode": "irreversible_precommit",
+      "mustDo": ["apply_hard_gates", "audit_load_bearing_assumptions", "run_counterexample_and_worst_case", "preserve_options", "predeclare_veto_or_delay_signal", "leave_commitment_to_user"],
+      "mustNotDo": ["force_fake_pilot", "claim_feedback_verified_choice"]
+    },
+    {
+      "id": "DEEP-17",
+      "situation": "测试任务明确要求最小审计记录",
+      "expectedMode": "bounded_audit_exception",
+      "mustDo": ["emit_observable_audit_trace_only", "restore_normal_presentation_after_test", "keep_test_result_non_promotional"],
+      "mustNotDo": ["emit_hidden_chain_of_thought", "leak_audit_template_into_normal_answer", "auto_promote_rule"]
+    }
+  ]
+}

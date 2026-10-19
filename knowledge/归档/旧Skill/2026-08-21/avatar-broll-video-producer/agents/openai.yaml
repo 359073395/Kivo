@@ -1,0 +1,4 @@
+interface:
+  display_name: "SKU 数字人口播混剪"
+  short_description: "按 SKU 准备人物图、用户语音、HeyGen 对口型和 ChatCut 成片"
+  default_prompt: "Use $avatar-broll-video-producer to build a per-SKU presenter-image, user-audio, HeyGen lip-sync, B-roll, Excel, and ChatCut editing package."

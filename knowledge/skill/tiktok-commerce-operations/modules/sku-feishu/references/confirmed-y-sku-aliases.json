@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "matchingPolicy": "Only these user-confirmed one-to-one aliases may bypass exact SKU text equality; all other SKUs still require exact matching.",
+  "aliases": [
+    {
+      "storeSku": "HK FOOT PASTE",
+      "warehouseSku": "HK FOOT PASTE 足贴",
+      "confirmedBy": "user",
+      "confirmedAt": "2026-09-02",
+      "evidence": "Same foot-patch product; Y warehouse pricing source row 187 has platform activity price 45380 IDR."
+    },
+    {
+      "storeSku": "Bait Red",
+      "warehouseSku": "Bait Red ",
+      "confirmedBy": "user",
+      "confirmedAt": "2026-10-13",
+      "evidence": "F:\\820\\flash-deal\\20261013-ten-store-refresh\\user-confirmations.json"
+    },
+    {
+      "storeSku": "Rat Repellent Spray",
+      "warehouseSku": "Rat Repellent Spray ",
+      "confirmedBy": "user",
+      "confirmedAt": "2026-10-13",
+      "evidence": "F:\\820\\flash-deal\\20261013-ten-store-refresh\\user-confirmations.json"
+    },
+    {
+      "storeSku": "596-Yellow FUYANG Cream",
+      "warehouseSku": "   596-Yellow FUYANG Cream",
+      "confirmedBy": "user",
+      "confirmedAt": "2026-10-13",
+      "evidence": "F:\\820\\flash-deal\\20261013-ten-store-refresh\\user-confirmations.json"
+    },
+    {
+      "storeSku": "SADOER Collagen Cream",
+      "warehouseSku": "SADOER Collagen Cream ",
+      "confirmedBy": "user",
+      "confirmedAt": "2026-10-13",
+      "evidence": "F:\\820\\flash-deal\\20261013-ten-store-refresh\\user-confirmations.json"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "HeyGen Video Producer"
+  short_description: "Generate and resume videos from a presenter execution table"
+  default_prompt: "Use $heygen-video-producer to continue the HeyGen tasks from my chosen task folder."

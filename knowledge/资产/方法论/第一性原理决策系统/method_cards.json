@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 4,
+  "system": "central-decision-framework",
+  "module": "first-principles-fixed-filter",
+  "independentTheorySystem": false,
+  "activeRuleIds": ["SYS-012", "IP-003", "IP-004", "IP-005", "IP-006"],
+  "runsInParallelWith": "mao-filter",
+  "userFacingPresentation": "natural_rationale_without_framework_labels",
+  "showInternalStructureOnlyWhen": ["explicit_framework_request", "explicit_source_trace_request", "explicit_audit_request"],
+  "feedbackPosition": "continuous_and_next_cycle_first_input",
+  "fieldEffectValues": ["changed", "confirmed", "rejected", "prevented_error", "no_material_effect"],
+  "couplingValues": ["changed", "confirmed", "rejected", "unrelated"],
+  "provenanceModel": {
+    "axes": ["provenance", "verification", "governanceStatus"],
+    "policy": "source verification never grants execution authority by itself"
+  },
+  "cards": [
+    {
+      "id": "FP-CHECK-01",
+      "name": "还原等式",
+      "requiredQuestion": "剥离行业术语、历史惯例和竞品做法后，最底层的物理/经济/认知等式是什么？",
+      "hardRequirements": ["equation_format", "no_proper_nouns", "variables_show_result_relationship", "observable_field_effect"],
+      "provenance": "user_confirmed_rule",
+      "verification": "direct_user_approval_checked",
+      "governanceStatus": "active",
+      "supportsRules": ["IP-004", "IP-006"]
+    },
+    {
+      "id": "FP-CHECK-02",
+      "name": "变量定位",
+      "requiredQuestion": "哪个变量当前波动最大，哪个变量是不随外部变化的常量？",
+      "hardRequirements": ["one_leverage_variable", "one_boundary_constant", "evidence_or_explicit_unknown", "intervention_direction", "observable_field_effect"],
+      "provenance": "user_confirmed_rule",
+      "verification": "direct_user_approval_checked",
+      "governanceStatus": "active",
+      "supportsRules": ["IP-004", "IP-006"]
+    },
+    {
+      "id": "FP-CHECK-03",
+      "name": "前提检验",
+      "requiredQuestion": "有哪些理所当然的隐含假设；极端情况下不成立时方案会崩塌吗？",
+      "hardRequirements": ["at_least_two_assumptions", "risk_label_only_bearable_or_fatal", "observable_field_effect"],
+      "provenance": "user_confirmed_rule",
+      "verification": "direct_user_approval_checked",
+      "governanceStatus": "active",
+      "supportsRules": ["IP-004", "IP-006"]
+    }
+  ],
+  "jointProbeRequirements": ["extreme_counterexample", "feedback_signal", "fatal_risk_gate", "observable_coupling"],
+  "parallelMaoOutput": ["contradiction_stage", "main_contradiction", "pace"],
+  "forbidden": ["concept_exposition", "sequential_handoff", "proprietary_nouns_in_equation", "fewer_than_two_assumptions", "unbounded_risk_labels", "framework_labels_in_default_user_answer", "fixed_filter_template_in_default_user_answer", "ornamental_field", "invented_coupling", "compact_path_escape"]
+}

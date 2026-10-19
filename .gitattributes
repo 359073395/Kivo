@@ -1,0 +1,5 @@
+* text=auto
+# The portable manifest hashes exact source bytes, including line endings.
+knowledge/** -text
+*.png -text
+*.mp4 -text

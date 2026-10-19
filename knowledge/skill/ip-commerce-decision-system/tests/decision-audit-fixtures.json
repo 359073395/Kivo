@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "fixtures": [
+    {"id": "AUDIT-FACT", "scenario": "pure_fact", "expected": "pass_direct", "observableCheck": "source_level_present"},
+    {"id": "AUDIT-EMPTY", "scenario": "all_fields_no_material_effect", "expected": "fail_and_recheck_route", "observableCheck": "not_accepted_as_complete"},
+    {"id": "AUDIT-UNSUPPORTED", "scenario": "action_without_field_support", "expected": "reject_action", "observableCheck": "action_gate_failed"},
+    {"id": "AUDIT-FAKE-PARALLEL", "scenario": "major_judgment_unrelated_filters", "expected": "redo_problem_definition", "observableCheck": "no_invented_coupling"},
+    {"id": "AUDIT-COMPACT-ESCAPE", "scenario": "compact_without_verified_runbook_or_with_anomaly", "expected": "upgrade_full", "observableCheck": "qualification_failed"},
+    {"id": "AUDIT-VALUE-FLIP", "scenario": "reasonable_value_order_flips_ranking", "expected": "user_value_choice", "observableCheck": "value_not_presented_as_fact"},
+    {"id": "AUDIT-IRREVERSIBLE", "scenario": "irreversible_no_feedback", "expected": "precommit_path", "observableCheck": "no_fake_pilot"}
+  ]
+}

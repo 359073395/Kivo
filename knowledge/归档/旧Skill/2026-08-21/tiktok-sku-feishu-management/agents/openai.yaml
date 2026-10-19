@@ -1,0 +1,4 @@
+interface:
+  display_name: "TikTok SKU 定价与飞书管理"
+  short_description: "管理多店铺 SKU 定价、活动上传、清仓检查和飞书派工"
+  default_prompt: "使用 $tiktok-sku-feishu-management 更新我的 TikTok SKU 定价和活动上传表。"

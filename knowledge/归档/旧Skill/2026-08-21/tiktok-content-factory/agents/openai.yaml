@@ -1,0 +1,4 @@
+interface:
+  display_name: "TikTok Content Factory"
+  short_description: "Create Indonesian scripts, execution tables, and images"
+  default_prompt: "Use $tiktok-content-factory to create an original TikTok Shop Indonesia content task in my chosen output folder."

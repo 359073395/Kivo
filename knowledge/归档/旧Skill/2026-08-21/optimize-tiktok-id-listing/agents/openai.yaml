@@ -1,0 +1,4 @@
+interface:
+  display_name: "Optimize TikTok ID Listings"
+  short_description: "Audit and optimize Indonesian TikTok Shop listings"
+  default_prompt: "Use $optimize-tiktok-id-listing to audit this Indonesian TikTok Shop product link and generate prioritized copy and image improvements."

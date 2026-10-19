@@ -1,0 +1,28 @@
+{
+  "fixture_id": "rewrite-white-shoes-001",
+  "source_type": "deidentified_historical_structure_fixture",
+  "source_notice": "专用于回归测试，不代表当前爆款、市场数据或可直接发布文案。",
+  "target_sku": "WHITE SHOES",
+  "reference_transcript_id": "Sepatu putih kamu masih kelihatan kusam? Aku pakai busa pembersih 500 ml ini. Tinggal semprot, tunggu sebentar, lalu lap pelan. Formula antibakterinya bikin noda lama langsung hilang. Cek keranjang kuning sebelum promonya selesai.",
+  "expected_structure_fingerprint": [
+    "0-3秒：白鞋发旧痛点提问",
+    "3-6秒：产品出现",
+    "6-10秒：操作步骤",
+    "10-13秒：结果/证据",
+    "13-15秒：购物车CTA"
+  ],
+  "forbidden_fact_transfer": [
+    "500 ml",
+    "antibakteri",
+    "langsung hilang",
+    "promonya selesai"
+  ],
+  "expected_safe_rewrite_id": "Kalau sneakers putihmu cepat terlihat kotor, jangan langsung dicuci total. Gunakan foam cleaner ini pada bagian yang perlu dibersihkan. Aplikasikan lalu usap mengikuti petunjuk pada kemasan. Praktis untuk perawatan sepatu sehari-hari. Lihat detail produknya di keranjang kuning.",
+  "known_bad_near_copy_id": "Sepatu putih kamu masih terlihat kusam? Aku pakai busa pembersih ini. Tinggal semprot, tunggu sebentar, lalu lap pelan. Noda lama langsung hilang. Cek keranjang kuning sebelum promo selesai.",
+  "expected_safe_output": {
+    "similarity_risk": "low_or_medium",
+    "must_not_transfer_reference_facts": true,
+    "generation_policy_result": "needs_human_qc",
+    "commercial_disclosure_required": true
+  }
+}

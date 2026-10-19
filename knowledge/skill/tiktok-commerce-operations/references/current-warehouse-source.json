@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-14",
+  "status": "current_user_designated_source",
+  "sourceDate": "2026-10-12",
+  "configuredRoot": "tiktokSkuRoot",
+  "relativePath": "02_SKU定价源/10.12印尼所有产品及定价.xlsx",
+  "sha256": "a07d07086cd1bef236232de1667646dca03fa4da16aca3fdcbc51a9cc169efd3",
+  "sheet": "Sheet1",
+  "headerRow": 1,
+  "columns": {
+    "sku": "B",
+    "chineseNameAndSourceNote": "C",
+    "shopeeReferencePrice": "D",
+    "catReferencePrice": "E",
+    "additionalSourceNotes": [
+      "F",
+      "G"
+    ]
+  },
+  "recordRows": 888,
+  "uniqueSkus": 887,
+  "sourceCard": "../../../资源/来源索引/2026-10-12_印尼仓库SKU价格来源卡.md",
+  "knowledgeAsset": "../../../资产/报告/印尼仓库SKU与价格当前资料.md",
+  "supersedes": {
+    "relativePath": "02_SKU定价源/9.12印尼所有产品及定价.xlsx",
+    "sha256": "06508fe63bb5a7b2946010eb029fc4a20d2f7d10693aad4b8194224ffaaee28f",
+    "role": "historical_source_only"
+  },
+  "price2": {
+    "relativePath": "02_SKU定价源/Y仓 TK SHOP SKU 售价_活动价_20261013在线快照.xlsx",
+    "status": "current_user_designated_online_source",
+    "sourceUrl": "https://my.feishu.cn/sheets/PLu3smtrShVmLItIJ6nccS0knab?sheet=0hArmx",
+    "spreadsheetToken": "PLu3smtrShVmLItIJ6nccS0knab",
+    "sheetId": "0hArmx",
+    "readDate": "2026-10-13",
+    "sha256": "a3de41f28dd9017e78476cf6caa875cfe04db4e0e91cd28aa8f5bdf78f21efcd",
+    "snapshotOnly": true,
+    "userQuote": "采用在线表格中的价格",
+    "sourceCard": "../../../资源/来源索引/2026-10-12_在线Y仓活动价作为当前价格2.md",
+    "lastVerifiedAt": "2026-10-14T00:04:55.329213+08:00"
+  },
+  "derivedUnifiedPrices": {
+    "relativePath": "04_输出结果/SKU统一定价表_价格1与价格2取低.xlsx",
+    "status": "current_for_source",
+    "lastKnownGenerationDate": "2026-10-14",
+    "sourceSha256": "a07d07086cd1bef236232de1667646dca03fa4da16aca3fdcbc51a9cc169efd3",
+    "sha256": "c81a5e5873ad1fe5431e931e367c546b3ff5792b49fa75ee19de2169f163ba13",
+    "verification": "本轮真实十店导出；确认报价/别名与降价；缺价阻断；Npcs逐项核验",
+    "pricingRule": "cat_e_plus_8000_then_5pct_min_y_20260922",
+    "price2Sha256": "a3de41f28dd9017e78476cf6caa875cfe04db4e0e91cd28aa8f5bdf78f21efcd",
+    "incrementalEvidence": "F:\\820\\flash-deal\\20261013-ten-store-refresh\\user-confirmations.json"
+  },
+  "flashDeal": {
+    "status": "ten_store_files_and_feishu_verified",
+    "lastKnownUpdateDate": "2026-10-14",
+    "preflightDate": "2026-10-14",
+    "pricingRule": "cat_e_plus_8000_then_5pct_min_y_20260922",
+    "verifiedStoreCount": 10,
+    "scopeStores": [
+      "ZivaCosme-ID",
+      "Nectar-Beauty",
+      "Sugar-Spice",
+      "Odd-Beauty",
+      "Velvet-Skin",
+      "Kulit-Bahagia",
+      "ElokSkincare-ID",
+      "BEAU-LAB",
+      "Calm-Chroma",
+      "Hue-Kiss"
+    ],
+    "writtenRows": 560,
+    "skippedMultiSkuProducts": 51,
+    "heldPriceProducts": 0,
+    "heldSkuProducts": 0,
+    "completedStores": [
+      "ZivaCosme-ID",
+      "Nectar-Beauty",
+      "Sugar-Spice",
+      "Odd-Beauty",
+      "Velvet-Skin",
+      "Kulit-Bahagia",
+      "ElokSkincare-ID",
+      "BEAU-LAB",
+      "Calm-Chroma",
+      "Hue-Kiss"
+    ],
+    "inputBasis": "本轮内置店小秘逐店同步、300条分页、全选与导出数量核验；逐行实际采集日期",
+    "onlinePublished": false,
+    "evidence": "F:\\820\\flash-deal\\20261013-ten-store-refresh\\local-completion.json",
+    "otherStoreFiles": "unchanged outside current ten-store scope",
+    "userConfirmedSkippedProducts": 1,
+    "pendingProducts": 0,
+    "skipDecisionEvidence": "F:\\820\\flash-deal\\20260929-ten-store\\skip-confirmation.json",
+    "userSpecifiedPriceProducts": 6,
+    "userSpecifiedPriceEvidence": "F:\\820\\flash-deal\\20260929-ten-store\\user-price-completion.json",
+    "lastKnownVerificationDate": "2026-10-14",
+    "priceSourceDate": "2026-10-13",
+    "verificationEvidence": "F:\\820\\flash-deal\\20261013-ten-store-refresh\\feishu-completion.json",
+    "currentSourceRepriceChanges": 36,
+    "pendingDecisionEvidence": null,
+    "resolvedDecisionEvidence": "F:\\820\\flash-deal\\20261013-ten-store-refresh\\user-confirmations.json"
+  },
+  "authorization": {
+    "date": "2026-10-12",
+    "userQuote": "这是最新的产品定价表，帮我更新所有数据以及表格，你知道是替换哪个吗？",
+    "task": "warehouse_source_and_derived_tables_update"
+  },
+  "pricingRule": {
+    "id": "cat_e_plus_8000_then_5pct_min_y_20260922",
+    "price1": "ceil((current warehouse column E + 8000) * 1.05) IDR",
+    "final": "min(price1, price2)",
+    "npcs": "final price of exact base SKU times positive integer quantity; no independent pack quote override",
+    "confirmedAt": "2026-09-22",
+    "userQuote": "最低价格是：猫店价格（普店+3000）+8000。然后再对比Y仓活动价表",
+    "userAddition": "还要再加 5% ！刚忘记告诉你了"
+  },
+  "npcsQuantityRule": {
+    "confirmedAt": "2026-10-10",
+    "userQuote": "还有就Npcs+SKU价格应该是单SKU价格*N",
+    "formula": "final_unit_price * N",
+    "source": "../../../资源/来源索引/2026-10-10_Npcs按最终单件价乘数量.md",
+    "unitPriceBasis": "Same price type. Activity: finalized base activity price. Display: same-store single-unit display price. Missing or conflicting unit reference requires review.",
+    "unifiedVerification": {
+      "rows": 374,
+      "errors": 0,
+      "sourceWorkbookSha256": "c81a5e5873ad1fe5431e931e367c546b3ff5792b49fa75ee19de2169f163ba13",
+      "note": "Existing unified Npcs numeric rows satisfy base final price times N. Current-batch user price exceptions are separate and must be propagated before multiplying."
+    }
+  },
+  "currentBatchDecisions": {
+    "evidence": "F:\\820\\flash-deal\\20261013-ten-store-refresh\\user-confirmations.json",
+    "scope": "20261013-ten-store-refresh",
+    "status": "applied",
+    "njHeadlightSelectedActivityPrice": 50520,
+    "note": "用户本轮选择，不将其变成忽略未来源价变化的永久固定价。4项精确别名已注册。7款新价已批准；未来新价差重新核对。"
+  }
+}

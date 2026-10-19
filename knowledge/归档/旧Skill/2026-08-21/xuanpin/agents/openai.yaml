@@ -1,0 +1,5 @@
+interface:
+  display_name: "TikTok 选品 Agent"
+  short_description: "运行并恢复 TikTok 市场选品、SKU 评分和记忆复盘闭环"
+  default_prompt: "使用 $xuanpin 读取当前规则和数据，完成 TikTok 选品分析、系统维护或恢复检查。"
+
