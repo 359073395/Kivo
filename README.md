@@ -1,3 +1,18 @@
+# Kivo · 知识驱动的本地创作工作台
+
+<img src="desktop/icon.png" width="88" alt="Kivo">
+
+基于 Easel 的增量版本，保留原平台工作流与114个内置技能，新增可追溯知识库、数据反馈自学习、创作校验和通用API独立工具引擎。Kivo 是品牌名，可赋义为 Knowledge In, Value Out（知识输入，价值输出），不是现成英文单词的释义。
+
+- [下载 Windows 0.3.1 桌面安装版](https://github.com/359073395/Kivo/releases/latest)
+- [Kivo使用、升级与本地存储说明](README-Kivo.md)
+- [知识副本与发布边界](PUBLICATION-NOTICE.md)
+
+Windows版自带Python和桌面运行环境，知识库、内容库、API配置与学习数据保存在本机；应用菜单可以检查更新。云端模型仅收到本次任务需要发送的输入与相关检索片段；完全离线需配置本地模型API。API Key、Cookie及账号登录态不随源代码或安装包发布。
+
+<details>
+<summary>上游 Easel 原始文档、贡献者与许可（完整保留）</summary>
+
 <p align="left">
   <img src="assets/readme/logos/zhejiang_university_horizontal_readme.png#gh-light-mode-only" width="106" align="middle" alt="Zhejiang University">
   <img src="assets/readme/logos/zhejiang_university_horizontal_dark.png#gh-dark-mode-only" width="106" align="middle" alt="Zhejiang University">
@@ -434,15 +449,7 @@ Easel 的技能体系和工作流受益于许多优秀的开源项目、工具�
     <img src="https://api.star-history.com/svg?repos=ZJU-REAL/Easel&type=Date" width="720" alt="Easel Star History Chart">
   </a>
 </p>
-# Kivo · 知识驱动的本地创作工作台
+</details>
 
-基于 Easel 的增量版本，保留原平台工作流与114个内置技能，新增可追溯知识库、数据反馈自学习、创作校验和通用API独立工具引擎。Kivo 是品牌名，可赋义为 **Knowledge In, Value Out**（知识输入，价值输出），不是现成英文单词的释义。
-
-- [下载 Windows 桌面安装版](https://github.com/359073395/Kivo/releases/latest)
-- [Kivo使用、升级与本地存储说明](README-Kivo.md)
-- [知识副本与发布边界](PUBLICATION-NOTICE.md)
-
-Windows版自带Python和桌面运行环境，知识库、内容库、API配置与学习数据保存在本机；应用菜单可以检查更新。云端模型仅收到本次任务需要发送的输入与相关检索片段；完全离线需配置本地模型API。API Key、Cookie及账号登录态不随源代码或安装包发布。
-
-以下保留原 Easel 项目文档、贡献者和第三方许可说明，原来的CLI与客户端接入仍可使用。
+原来的CLI与客户端接入仍可选用，第三方组件继续遵守各自许可证。
 

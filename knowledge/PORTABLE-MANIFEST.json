@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-19T11:31:16.0227818Z",
+  "generatedAt": "2026-10-19T13:07:02.6195580Z",
   "rootMarker": "knowledge-base.json",
   "excludes": [
     "PORTABLE-MANIFEST.json",
@@ -70,13 +70,13 @@
     },
     {
       "path": "辅助\\日志\\知识库日志.md",
-      "bytes": 127067,
-      "sha256": "7812cef77b636f37cb94260d8215ec48e40d27eec953b72659edbb08e8b715cd"
+      "bytes": 127859,
+      "sha256": "db36f92e4077f29926bd5821d27b9fbc2377f0ea419efe879617edd77cc30317"
     },
     {
       "path": "辅助\\摄入队列\\摄入队列.md",
-      "bytes": 26193,
-      "sha256": "4202ba9494a98e13ac48e4ca5b7cc3543e51f4945a0c538633407fd7a8ec430e"
+      "bytes": 26265,
+      "sha256": "9b24c09f3f49bbc0f5d7040e61080c8382809770f9e311bceb82cc0fbf895f3e"
     },
     {
       "path": "辅助\\维护\\蒸馏检查清单.md",
@@ -7665,8 +7665,8 @@
     },
     {
       "path": "首页.md",
-      "bytes": 10030,
-      "sha256": "09e959e424cbcf777652807e94ac14fc13e332ac5b7ded539f479bbdd86ca551"
+      "bytes": 10141,
+      "sha256": "3b33bcdf3a5a9b4f88d4021da90305d5d2a5a588bfd1a03ad4350adc4a64fc61"
     },
     {
       "path": "项目\\会话交接\\2026-09-05_18店铺income扣点核算.md",
@@ -7770,8 +7770,8 @@
     },
     {
       "path": "项目\\进行中\\20260927_十店单人运营周计划.md",
-      "bytes": 47698,
-      "sha256": "d70cfc7539368c171b51bc500a7e1fb6366f1256b5397f995a7747e1b1eb7a4a"
+      "bytes": 48532,
+      "sha256": "19331d03f37600474f5ea4c9795da68380444a7505c1197896131b5c59bea922"
     },
     {
       "path": "项目\\进行中\\20260928_两SKU可视化销量交叉选品.md",
@@ -7795,8 +7795,8 @@
     },
     {
       "path": "项目\\进行中\\20261019_灵犀自媒体平台国内版.md",
-      "bytes": 3845,
-      "sha256": "a9b51e3a8a4f93cdea6f2082d0771aac7e8bf2833c91ef2267bc0644f412cf9b"
+      "bytes": 6483,
+      "sha256": "7daa08e2c5101e7ca0e07f33df9aa63df56047366fd6c70c6081c811b4b07adb"
     },
     {
       "path": "项目\\进行中\\毛选综合蒸馏_2026-08-24.md",
@@ -12545,8 +12545,8 @@
     },
     {
       "path": "资源\\来源索引\\2026-10-19_本周先上链接测流量与成交.md",
-      "bytes": 3874,
-      "sha256": "b12c878931f26d964ff2f6c8622f7a35d84046371ff877e7d889d12b05b59351"
+      "bytes": 5368,
+      "sha256": "fa8dd31f6a7a67934b69ef9ac6c3b7128a2aa339af02aecc91ab6f88a6f4faf3"
     },
     {
       "path": "资源\\来源索引\\2026-10-19_电商工具箱增量补充授权.md",
@@ -12555,8 +12555,8 @@
     },
     {
       "path": "资源\\来源索引\\2026-10-19_灵犀自媒体平台国内版项目要求.md",
-      "bytes": 2307,
-      "sha256": "da14db2e31ed59b285f7b318603961efc113661ef83724ab7d5b2412ee8f73f4"
+      "bytes": 3167,
+      "sha256": "e552fbe23fa14293db2e5f1538dd5cfd019353a20a845bf256859a94fc3bd2e6"
     },
     {
       "path": "资源\\来源索引\\2026-10-19_选品须查SKU创建时间与双站点产品.md",
@@ -14025,8 +14025,8 @@
     },
     {
       "path": "skill\\knowledge-iteration\\references\\maintenance-workflow.md",
-      "bytes": 3796,
-      "sha256": "9476786fbfc4d3d733a4d1b4793867ba555473d84af22e19404b5d321d08d46e"
+      "bytes": 4308,
+      "sha256": "9d9b04c84b6a94fe15e604e7ac1a3111102ab0fc22cf64266287a36082eb088b"
     },
     {
       "path": "skill\\knowledge-iteration\\references\\session-handoff.md",
@@ -14535,8 +14535,8 @@
     },
     {
       "path": "skill\\tiktok-commerce-operations\\references\\ten-store-daily-test-standard.json",
-      "bytes": 39794,
-      "sha256": "f7eb278ebdb1c2eb79a92409a4a91f91ca0de775f359b618e81a9308488b0435"
+      "bytes": 46401,
+      "sha256": "ae54769ae42a3b6b2d00733fa56d4a5c9ffb82bc0af072c5bebf9a3cb97a78c6"
     },
     {
       "path": "skill\\tiktok-commerce-operations\\scripts\\campaign_plan_gate.py",
