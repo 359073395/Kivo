@@ -100,7 +100,7 @@ def test_all_non_ascii_ps1_files_keep_bom() -> None:
     import subprocess
 
     out = subprocess.run(["git", "-c", "core.quotepath=false", "ls-files", "*.ps1"], cwd=PROJECT_ROOT,
-                         capture_output=True, text=True, timeout=60).stdout
+                         capture_output=True, text=True, encoding="utf-8", timeout=60).stdout
     checked = 0
     for rel in out.splitlines():
         if "vendor/" in rel or rel.startswith("knowledge/"):
