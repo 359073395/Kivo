@@ -31,17 +31,20 @@ fs.mkdirSync(path.join(platform, 'desktop'), { recursive: true });
 fs.copyFileSync(path.join(__dirname, 'backend.py'), path.join(platform, 'desktop', 'backend.py'));
 const python = path.join(out, 'python');
 if (!fs.existsSync(path.join(python, 'python.exe'))) throw new Error('先运行Prepare-Python.ps1准备官方嵌入式运行环境');
-walk(path.join(root, '.venv', 'Lib', 'site-packages'), path.join(python, 'Lib', 'site-packages'), (name) => !/^__editable__|\.pth$|^(?:pytest|_pytest|iniconfig|pluggy)(?:-|\.|$)/.test(name));
+walk(path.join(root, '.venv', 'Lib', 'site-packages'), path.join(python, 'Lib', 'site-packages'), (name) => !/^__editable__|\.pth$|^[tw]64-arm(?:64)?\.exe$|^(?:pytest|_pytest|iniconfig|pluggy)(?:-|\.|$)/.test(name));
 fs.writeFileSync(path.join(python, 'python314._pth'), 'python314.zip\n.\nLib/site-packages\n../../platform\n../../platform/skills/shared/scripts\nimport site\n');
 
-function manifest(folder, destination) {
+function manifest(folder, destination, include = () => true) {
   const files = [];
   function scan(current) {
     for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
       const full = path.join(current, entry.name);
       if (entry.isSymbolicLink()) throw new Error('包内不能有符号链接');
       if (entry.isDirectory()) scan(full);
-      else files.push({ path: path.relative(folder, full).split(path.sep).join('/'), sha256: sha(fs.readFileSync(full)) });
+      else {
+        const relative = path.relative(folder, full).split(path.sep).join('/');
+        if (include(relative)) files.push({ path: relative, sha256: sha(fs.readFileSync(full)) });
+      }
     }
   }
   scan(folder);
@@ -62,7 +65,11 @@ for (const file of portable.files) {
 fs.copyFileSync(path.join(vaultRoot, 'PORTABLE-MANIFEST.json'), path.join(vaultOut, 'PORTABLE-MANIFEST.json'));
 const knowledgeFiles = manifest(vaultOut, 'knowledge-manifest.json');
 const platformFiles = manifest(platform, 'platform-manifest.json');
-const runtimeFiles = manifest(python, 'runtime-manifest.json');
+// electron-builder strips ARM launchers from an x64 NSIS package. These pip
+// helpers are not used by x64 Python; do not require them in the integrity list,
+// including when an earlier staging directory still contains copies.
+const runtimeFiles = manifest(python, 'runtime-manifest.json',
+  (relative) => !/^Lib\/site-packages\/pip\/_vendor\/distlib\/[tw]64-arm(?:64)?\.exe$/.test(relative));
 if (platformFiles.some((file) => /(?:^|\/)\.env(?:$|\.(?!example$))|cookies\.json$|^(?:outputs|profiles)\//.test(file.path))) throw new Error('包内发现用户配置，停止打包');
 console.log(JSON.stringify({ version, platformFiles: platformFiles.length, runtimeFiles: runtimeFiles.length,
   skills: fs.readdirSync(path.join(platform, 'skills/builtin')).filter((p) => fs.existsSync(path.join(platform, 'skills/builtin', p, 'SKILL.md'))).length,

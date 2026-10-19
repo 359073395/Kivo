@@ -106,6 +106,18 @@ def test_fetch_propagates_actionable_script_error(monkeypatch):
         asyncio.run(web._fetch_analytics("xiaohongshu"))
 
 
+def test_works_without_identity_report_learning_gap_without_guessing_account(monkeypatch):
+    payload = {"loggedIn": True, "followers": 0, "notes": [{"note_id": "one", "views": 20}]}
+    monkeypatch.setattr(web, "_run_analytics_command", lambda *args: subprocess.CompletedProcess(
+        [], 0, json.dumps(payload), ""))
+    store = Mock()
+    monkeypatch.setattr(web, "FeedbackStore", store)
+    result = asyncio.run(web._fetch_analytics("xiaohongshu"))
+    assert result["notes"] == payload["notes"]
+    assert result["knowledgeLearning"]["reason"] == "account_identity_missing_use_manual_feedback"
+    store.assert_not_called()
+
+
 def test_fetch_reports_bounded_timeout(monkeypatch):
     runner = Mock(side_effect=subprocess.TimeoutExpired("fetch", 90))
     monkeypatch.setattr(web, "_run_analytics_command", runner)

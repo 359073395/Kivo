@@ -4898,7 +4898,7 @@ async def _fetch_analytics(platform: str):
                     result["knowledgeLearning"] = await asyncio.to_thread(FeedbackStore().ingest_analytics, platform, identity, result)
                 except (ValueError, OSError, sqlite3.DatabaseError):
                     result["knowledgeLearning"] = {"saved": 0, "reason": "learning_storage_unavailable"}
-            else:
+            elif result.get("notes") or result.get("metrics"):
                 result["knowledgeLearning"] = {"saved": 0, "reason": "account_identity_missing_use_manual_feedback"}
             return result
     detail = (proc.stderr or "").strip().splitlines()[-1:] or ["未取到数据"]
