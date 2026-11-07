@@ -7,6 +7,7 @@ export interface ChatMessage {
   attachments?: UploadedFile[]; // 结构化附件引用；仅用于请求/重试，不在消息气泡展示
   thinking?: string;   // 模型思考过程（隐思考），流式结束后持久保留
   activity?: string;   // 工具/执行活动步骤（换行分隔），持久保留
+  questions?: ChatQuestion[];
 }
 
 export interface ChatSession {
@@ -128,8 +129,17 @@ function prune(sessions: ChatSession[]): ChatSession[] {
   return pruned.slice(0, MAX_SESSIONS);
 }
 
-export function saveSessions(sessions: ChatSession[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(prune(sessions)));
+export function saveSessions(sessions: ChatSession[]): boolean {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(prune(sessions)));
+    return true;
+  } catch {
+    // Notify after the React state updater finishes, retaining the live reply.
+    if (typeof window !== 'undefined') {
+      queueMicrotask(() => window.dispatchEvent(new Event('easel-session-save-error')));
+    }
+    return false;
+  }
 }
 
 export function createSession(persona?: string): ChatSession {

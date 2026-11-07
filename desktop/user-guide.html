@@ -1,0 +1,272 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:"><title>Kivo 新手使用指南 · 0.3.3</title><style>
+  :root{font-family:"Microsoft YaHei",system-ui,sans-serif;color:#23313c;background:#f4f6f8;font-size:16px;line-height:1.85}*{box-sizing:border-box}body{margin:0}header{padding:28px 5vw;background:#17232f;color:white}header b{font-size:28px}header span{display:block;color:#b8c9d4}main{max-width:1220px;margin:auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;padding:28px}nav{position:sticky;top:20px;align-self:start;background:white;border:1px solid #dae1e6;border-radius:12px;padding:18px;font-size:14px}nav a{display:block;padding:7px 0;text-decoration:none;color:#215f6b}article{min-width:0;background:#fff;padding:32px 40px;border-radius:12px;border:1px solid #dae1e6}h1{font-size:28px;line-height:1.4}h2,h3{font-size:20px;line-height:1.55;scroll-margin-top:20px}h2{border-top:1px solid #dae1e6;margin-top:36px;padding-top:24px}h3{color:#215f6b}p,li{overflow-wrap:anywhere}blockquote{background:#edf8f7;border-left:4px solid #248c88;margin:20px 0;padding:10px 20px}table{border-collapse:collapse;width:100%;font-size:14px;table-layout:fixed}th,td{border:1px solid #dce4e8;text-align:left;vertical-align:top;padding:10px;overflow-wrap:anywhere}th{background:#edf2f5}li{margin:8px 0}a{color:#146c76}code{background:#f2f4f6;padding:2px 5px}strong{font-weight:700}@media(max-width:850px){main{display:block;padding:16px}nav{position:static;margin-bottom:16px}article{padding:20px}}@media print{header,nav{display:none}main{display:block;padding:0;max-width:none}article{border:0;padding:0}body{background:white}h2,h3{break-after:avoid}tr,blockquote{break-inside:avoid}table{font-size:12px}a{color:inherit}}
+  </style><header><b>Kivo · 从安装到第一份作品</b><span>新手使用指南 · 国内版 0.3.3 · 可离线阅读 / Ctrl+P 打印</span></header><main><nav aria-label="目录"><a href="#section-1">1. 收到文件后先做什么</a><a href="#section-2">2. 第一次配置 AI：三个信息不要混淆</a><a href="#section-3">3. 页面有什么用</a><a href="#section-4">4. 十分钟做出第一份草稿</a><a href="#section-5">5. 怎样使用和增加知识</a><a href="#section-6">6. 发布后，怎样让数据反哺下一次创作</a><a href="#section-7">7. 账号、日历和发布，应该怎样测试</a><a href="#section-8">8. 数据在哪里，怎样备份和升级</a><a href="#section-9">9. 常见问题：按现象处理</a><a href="#section-10">10. 给测试朋友的一张清单</a><a href="#section-11">11. 再记住这四句话</a></nav><article><h1>Kivo 新手使用指南</h1>
+<p>国内版 · Windows 测试版 0.3.3 · 2026 年 11 月 4 日</p>
+<p><strong>一句话理解：Kivo 是装在自己电脑里的 AI 创作工作台。</strong>你告诉它账号做什么、面向谁、有哪些真实资料，它可以结合知识库协助选题、写标题、写文案和脚本，把作品留在本地，再根据实际数据复盘。</p>
+<p>它不是 Tikivo 海外运营系统，也不是“一安装就能自动发布、自动涨粉”的软件。第一次使用先完成“安装 → 接入自己的 AI → 建画像 → 生成一份草稿”即可。</p>
+<h2 id="section-1">1. 收到文件后先做什么</h2>
+<p>本次需要的两个文件：</p>
+<ul>
+<li><strong>Kivo-Setup-0.3.3.exe</strong>：双击安装软件。</li>
+<li><strong>Kivo-新手使用指南.html</strong>：双击用浏览器打开本说明，可以离线看；按 Ctrl+P 可以打印或另存为 PDF。</li>
+</ul>
+<p>适用 Windows 10/11 的 64 位电脑。本包不是 Mac、手机或 Windows ARM 原生安装包。自带运行环境，不需要安装 Python、Node、Codex 或其他 AI 桌面客户端。安装文件约数百 MB，安装和首次准备还需要额外空间；请选择空间充足的本地磁盘。</p>
+<ol>
+<li>双击安装包，按向导选择安装位置并完成安装。</li>
+<li>从桌面打开 <strong>Kivo</strong>，第一次启动会校验程序和准备本地知识，请等待进度变化，不要连续开很多次。</li>
+<li>看到“工作台、对话、学习知识库”等导航，表示界面已经打开。</li>
+<li>软件没有统一的“测试账号密码”，也没有附赠 AI Key。AI 服务和各内容平台账号要使用自己的。</li>
+</ol>
+<p><strong>安全提示：</strong>测试版未进行商业代码签名，Windows 可能提示未知发布者。先确认文件是可信发送人提供、版本正确；可让发送人核对 SHA256SUMS.txt。来源不明或被安全软件报毒时暂停安装，不要关闭安全软件强行运行。</p>
+<h2 id="section-2">2. 第一次配置 AI：三个信息不要混淆</h2>
+<p>Kivo 是工作台，真正生成文字的是你接入的 AI 服务。服务商通常会提供以下三项：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>小白可以怎样理解</th>
+<th>去哪里找</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Base URL</td>
+<td>AI 服务的接口地址，不是聊天网站首页</td>
+<td>服务商的 API 接入说明</td>
+</tr>
+<tr>
+<td>API Key</td>
+<td>调用 AI 的私人钥匙</td>
+<td>自己的服务商账号中创建</td>
+</tr>
+<tr>
+<td>模型</td>
+<td>要使用的 AI 型号</td>
+<td>服务商支持的模型名称</td>
+</tr>
+</tbody></table>
+<p>需要支持 <strong>OpenAI 兼容协议</strong>的服务。想让 AI 查知识、读技能、保存作品，还需要模型支持 <strong>工具调用（tools / tool_calls）</strong>。仅能聊天的模型不一定能执行完整流程。</p>
+<p>操作步骤：</p>
+<ol>
+<li>点击界面左下角的设置入口。</li>
+<li>在底座/引擎配置中使用 <strong>通用 API / API 直连</strong>。如改了底座，先点击 <strong>保存底座</strong>；新安装默认使用 API。</li>
+<li>在 <strong>通用 API 配置（独立运行）</strong>填写服务商给的地址、Key 和模型。不要把 Key 粘贴到聊天框，也不要截屏发给别人。</li>
+<li>点击 <strong>保存并自测</strong>。查看页面顶部的成功或失败说明；只填进去、没有保存，不代表生效。</li>
+<li>保存后新建一个对话，发送：“你好，请用一句话介绍你能帮我做什么。”</li>
+<li>再发送：“请检索知识库中关于选题的资料，列出三条建议并标出来源。先不要发布任何内容。”</li>
+</ol>
+<p>第 5 步验证能否聊天；第 6 步验证工具调用。自测成功不等于所有媒体服务、平台登录和发布都可用了。模型请求通常会消耗服务商额度，由你自己的账号支付；Kivo 没有赠送额度。</p>
+<h2 id="section-3">3. 页面有什么用</h2>
+<table>
+<thead>
+<tr>
+<th>页面 / 入口</th>
+<th>你可以做什么</th>
+<th>使用条件和边界</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>工作台</td>
+<td>查看内容工作流，进入热点雷达、选题库、内容日历、发布中心等入口</td>
+<td>排期不等于已经发布；在线抓取依赖对应服务</td>
+</tr>
+<tr>
+<td>对话</td>
+<td>自由描述需求，让 AI 辅助策划、检索、改稿、调用技能、保存作品</td>
+<td>需要可用 AI API；重要动作要看清确认提示</td>
+</tr>
+<tr>
+<td>学习知识库</td>
+<td>查知识、带知识创作、检查文案、添加新方法、录入数据并复盘</td>
+<td>本地检索不需要 AI Key；AI 创作和提炼需要 API</td>
+</tr>
+<tr>
+<td>技能库</td>
+<td>查看内置的 114 项原有技能及使用说明，找到适合自己的工作流程</td>
+<td>有技能入口不等于外部工具已安装或已授权</td>
+</tr>
+<tr>
+<td>内容库</td>
+<td>查看工作流保存的作品和文件，预览可支持的内容</td>
+<td>聊天里出现一段文字不等于已经保存成作品</td>
+</tr>
+<tr>
+<td>账号</td>
+<td>管理和连接支持的平台账号</td>
+<td>各平台单独登录；登录是否成功以实际页面为准</td>
+</tr>
+<tr>
+<td>画像</td>
+<td>记录账号定位、受众、目标、表达偏好和红线</td>
+<td>画像是给 AI 的创作背景，不是平台登录账号</td>
+</tr>
+</tbody></table>
+<p>原工作流保留小红书、抖音、快手、B站、知乎、公众号、视频号相关能力入口。不同平台、不同媒体功能所需服务不同，本测试版不保证全部平台均能直接抓取或发布。</p>
+<p>图片、视频、配音、转写等能力需要相应后端、模型或工具。<strong>文字 API 的 Key 不会自动开通所有图片/视频服务。</strong>遇到依赖缺失时先完成配置；不要把失败当成已经生成或已经发布。</p>
+<h2 id="section-4">4. 十分钟做出第一份草稿</h2>
+<h3>第一步：建立你的画像</h3>
+<p>打开 <strong>画像 → 新建画像</strong>，按提示填写账号名称、内容平台、方向、目标、语气和不能说的内容。名称可以是“我的生活分享号”；不需要填写密码。没有历史账号链接可以先跳过。</p>
+<p>示例：账号做家居收纳，受众是小户型租房的人，希望获得收藏和关注，语气亲切，不虚构产品效果和个人经历。创建后选中这个画像。AI 增强失败不一定代表基础画像没有保存，请先回画像列表检查。</p>
+<h3>第二步：把目标和真实资料讲清楚</h3>
+<p>打开 <strong>学习知识库 → 辅助创作与校验</strong>，选择平台和产出类型，填写“主题与目标”“已确认事实”，再点 <strong>结合知识开始创作</strong>。也可以直接进入对话，复制下面这段，把方括号改成自己的内容：</p>
+<blockquote>
+<p>我要给[平台]做一条关于[主题]的内容。受众是[人群]，目的是[收藏/关注/咨询等]。已确认的事实是[真实资料]，没有确认的地方请标“待补充”。请先查相关知识，给我3个选题角度、5个标题和1版正文，并说明引用依据。先给草稿，不发布。</p>
+</blockquote>
+<h3>第三步：继续对话改稿</h3>
+<p>不要满意度不高就全部重来，告诉它具体问题，例如：</p>
+<blockquote>
+<p>保留第二个标题的方向。正文太像广告，请更口语化；开头直接写目标人群的真实困扰。不要增加我没有提供的数字、经历或功效。</p>
+</blockquote>
+<p>短视频可这样提需求：</p>
+<blockquote>
+<p>基于这份资料写一段30秒口播脚本，分成开头、主体和结尾。用表格列出画面建议、口播、字幕和预计时长。只写脚本，不调用付费视频生成。</p>
+</blockquote>
+<h3>第四步：检查并保存</h3>
+<ol>
+<li>在 <strong>学习知识库 → 辅助创作与校验</strong>粘贴标题和正文，点 <strong>检查文本</strong>；需要深改时使用 <strong>AI 深审与修改</strong>。</li>
+<li>自己核对商品规格、人物经历、引用、数字、承诺和版权。自动检查没发现问题，不代表平台审核一定通过。</li>
+<li>在对话中要求：“请把刚确认的最终稿保存到本地内容库，名称为[名称]。不要发布。”</li>
+<li>打开 <strong>内容库</strong>，确认能找到并打开最终稿。如果没找到，不要只相信聊天中的“已保存”，先查看提示或追问保存结果。</li>
+<li>初次测试建议手动复制到平台草稿箱，亲自预览后再决定发布。</li>
+</ol>
+<h2 id="section-5">5. 怎样使用和增加知识</h2>
+<h3>查现有知识</h3>
+<p>打开 <strong>学习知识库 → 检索知识</strong>，输入“选题”“开头”“用户定位”等关键词。点一条结果查看正文、来源、状态和适用范围。若提示未建立索引，点击 <strong>同步本地知识</strong>并等待结束；没有结果时换短关键词或检查知识目录。</p>
+<p>内置的是此前获准随 Kivo 分享的知识快照，不会自动拉取发送人的最新个人资料。历史案例、课程观点和参考材料不等于你的账号必须照做的规则，也不代表平台的实时政策。</p>
+<h3>加入自己的资料</h3>
+<ol>
+<li>打开 <strong>学习知识库 → 学习新资料</strong>。</li>
+<li>填写资料标题、来源说明，粘贴完整文字稿；或者点击 <strong>导入 Markdown / TXT</strong>。</li>
+<li>不确定的方法，先用 <strong>保存并进入学习</strong>。需要提炼时点 <strong>AI 提炼候选方法</strong>。</li>
+<li>核对 AI 的结果，把真正适用的方法填入“审核后的方法”，再点 <strong>确认方法并用于后续创作</strong>。</li>
+<li>只有你确实已经验证或确认的方法，才勾选“这是我已确认的方法，保存后直接用于后续创作”。</li>
+</ol>
+<p>视频、音频和 PDF 不能在这个文字导入按钮里直接当作文字处理。先用可用的转写/提取工具获得文字稿，再导入。不要将账号密码、API Key、未经允许分享的客户资料作为知识上传。</p>
+<h2 id="section-6">6. 发布后，怎样让数据反哺下一次创作</h2>
+<p>进入 <strong>学习知识库 → 数据反馈与自学习</strong>，按真实后台数据填写：</p>
+<ol>
+<li><strong>平台、账号</strong>：固定使用同一个账号名称，尽量与画像名称一致，避免把两个账号混起来。</li>
+<li><strong>内容编号</strong>：作品 ID 或唯一链接，同一作品每次都用同一个编号。</li>
+<li><strong>数据来源</strong>：例如“抖音创作者后台，11月4日记录”。</li>
+<li><strong>观察时长</strong>：例如发布后 24 小时；不知道就留空。</li>
+<li><strong>指标</strong>：填写有证据的播放、阅读、点赞、收藏等。未知留空，只有后台明确显示 0 才填 0。</li>
+<li>点 <strong>保存反馈并自动学习</strong>，再用 <strong>结合数据复盘与创作</strong>生成下一轮建议。</li>
+</ol>
+<p>可选填写实验名称、A/B 版本和本次改变的变量，便于对比。支持批量 JSON 导入，格式示例就在页面“批量数据格式与自动学习边界”中；初学者建议先手动录入一条，不要直接上传任意 Excel。</p>
+<p>自动学习的意思是保存有来源的经验、计算可以计算的指标并辅助下次检索，<strong>不是训练或修改大模型权重</strong>。同一作品的重复快照会去重；数据出错可点“停用此反馈”。一条爆款不能证明某个方法永远有效。</p>
+<p>原有数据页成功获得结构化数值和账号身份时可以自动摄入；抓取失败、只有文字或身份不清时仍需手动录入，不是对所有平台全天自动同步。</p>
+<h2 id="section-7">7. 账号、日历和发布，应该怎样测试</h2>
+<p>先把创作和保存测试通，再去 <strong>账号</strong>连接你需要的平台。登录页面、二维码或附加依赖以实际提示为准；不要把自己的账号密码发送给软件作者。</p>
+<p>在工作台的选题和日历入口安排内容后，再去发布中心确认目标平台、账号、文件、标题和时间。执行脚本或发布时，先读完整确认信息。测试期建议先存草稿、少量人工核对；本次安装验证没有替你验证真实平台发布、抓取或定时触发。</p>
+<p><strong>不要认为“日历里有一条任务”就代表已经发出，也不要认为“技能库有发布技能”就代表你已登录所有平台。</strong>最终结果请到平台后台检查。</p>
+<h2 id="section-8">8. 数据在哪里，怎样备份和升级</h2>
+<p>点击桌面顶部菜单 <strong>应用 → 打开数据文件夹</strong>，这个位置才是本机实际使用的数据目录。默认是 Windows 用户目录下的 <code>%APPDATA%\kivo-desktop</code>，不是发送人的电脑目录。</p>
+<table>
+<thead>
+<tr>
+<th>本地内容</th>
+<th>目录 / 文件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>内置知识的本地可编辑副本</td>
+<td>knowledge-vault</td>
+</tr>
+<tr>
+<td>新学习资料、学习方法、索引和反馈</td>
+<td>knowledge</td>
+</tr>
+<tr>
+<td>已保存的作品及会话恢复文件</td>
+<td>platform/outputs</td>
+</tr>
+<tr>
+<td>画像</td>
+<td>platform/profiles</td>
+</tr>
+<tr>
+<td>AI 私人配置</td>
+<td>model.env</td>
+</tr>
+<tr>
+<td>启动和服务日志</td>
+<td>startup.log、server.log</td>
+</tr>
+</tbody></table>
+<p>正常新电脑使用自己的内置知识副本；如果已选择其他正式知识目录，也要单独备份那个目录。知识和内容保存在本地，不需要登录 Codex。使用云端 AI 时，本次输入、附件及相关检索片段会发送给你配置的供应商；“本地保存”不等于“云端 AI 看不到输入”。完全离线 AI 需要自行配置本机模型接口。</p>
+<p><strong>备份：</strong>先通过“应用 → 退出”关闭 Kivo，再把整个数据目录复制到你自己的安全备份位置。备份中可能含 Key、账号会话和私有内容，不要把它当测试包发给朋友。</p>
+<p><strong>升级：</strong>“应用 → 检查更新”只检查已配置发布源。此次 0.3.3 是本地重新打包，不代表已上传 GitHub。收到可信新版安装包也可以覆盖安装，正常升级会保留用户数据；重要资料仍建议事先备份。知识升级遇到本地修改冲突时会保留本地版本并把新版放入 knowledge-incoming，不要直接批量覆盖。</p>
+<h2 id="section-9">9. 常见问题：按现象处理</h2>
+<table>
+<thead>
+<tr>
+<th>现象</th>
+<th>先做什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>安装时提示未知发布者</td>
+<td>确认可信来源和校验值；来源不明就停止，不要关闭杀毒软件</td>
+</tr>
+<tr>
+<td>首次启动很久</td>
+<td>看进度是否变化，等待校验；持续无变化再查看启动日志。不要反复双击</td>
+</tr>
+<tr>
+<td>启动失败或出现 EXDEV</td>
+<td>保留截图和 startup.log/server.log，确认“关于Kivo”版本；不要删除数据目录重试</td>
+</tr>
+<tr>
+<td>API 401/403</td>
+<td>核对 Key、权限和服务商账号状态，不要把 Key 截图发出去</td>
+</tr>
+<tr>
+<td>API 404 / 模型不存在</td>
+<td>核对 Base URL 与模型准确名称，按服务商要求填写，不自行拼接重复接口路径</td>
+</tr>
+<tr>
+<td>API 429 / 额度不足</td>
+<td>查看服务商额度或频率限制，稍后重试；不要连续点击造成更多请求</td>
+</tr>
+<tr>
+<td>能聊天但不能查知识/保存作品</td>
+<td>检查模型工具调用支持，确认使用通用 API 底座，保存后新建对话</td>
+</tr>
+<tr>
+<td>知识搜索为空</td>
+<td>打开学习知识库，检查目录和状态，再同步本地知识；试用短关键词</td>
+</tr>
+<tr>
+<td>图片、视频或转写失败</td>
+<td>单独检查该媒体后端及额度；文字 API 正常不能证明媒体服务正常</td>
+</tr>
+<tr>
+<td>内容库找不到刚才的文字</td>
+<td>确认已经要求保存并回读文件；聊天回答本身不一定是落盘作品</td>
+</tr>
+<tr>
+<td>平台登录/抓取/发布失败</td>
+<td>查看具体平台提示和依赖；先手动操作验证账号，不要批量重发</td>
+</tr>
+<tr>
+<td>检查更新失败</td>
+<td>可能是网络或发布源问题；不影响已安装版的本地功能</td>
+</tr>
+</tbody></table>
+<h2 id="section-10">10. 给测试朋友的一张清单</h2>
+<p>建议按顺序测试，不要一开始就接全部平台或跑付费视频：</p>
+<ul>
+<li>□ 安装成功，关于Kivo显示 0.3.3。</li>
+<li>□ 关闭后再次打开，仍能进入工作台。</li>
+<li>□ 自己的 API 保存并自测成功，可以正常聊天。</li>
+<li>□ 知识搜索有结果，能查看来源。</li>
+<li>□ 创建自己的画像，生成并修改一份文字稿。</li>
+<li>□ 最终稿能在内容库找到并打开，重启后还在。</li>
+<li>□ 添加一份自己的测试文字资料，审核后可用于创作。</li>
+<li>□ 录入一条明确标注为测试的数据，检查反馈功能；测完停用，不混入真实经营结果。</li>
+<li>□ 如确有需要，再单独测试平台账号和媒体服务。</li>
+</ul>
+<p>反馈问题时请提供：<strong>软件版本、Windows版本、刚才点了什么、期望结果、实际结果、发生时间、是否每次都能重现</strong>。附截图和必要日志片段前先遮住 Key、Cookie、手机号、客户信息和私有内容。不要直接发送整个数据目录。</p>
+<h2 id="section-11">11. 再记住这四句话</h2>
+<p><strong>用自己的 Key；先做一份草稿；重要动作亲自确认；真实数据回来再复盘。</strong></p>
+<p>Kivo 保留 Easel 原工作流与第三方许可。本包用于朋友测试；知识快照中的来源和权利声明仍有效。功能入口、测试通过、真实平台业务成功和营销效果是四件不同的事。</p>
+</article></main></html>

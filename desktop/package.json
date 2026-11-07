@@ -1,6 +1,6 @@
 {
   "name": "kivo-desktop",
-  "version": "0.3.1",
+  "version": "0.3.3",
   "description": "Kivo 本地知识驱动创作工作台 Windows 桌面版",
   "author": "Kivo",
   "license": "Apache-2.0",
@@ -17,7 +17,7 @@
     "appId": "app.kivo.creator",
     "productName": "Kivo",
     "directories": { "output": "dist" },
-    "files": ["main.cjs", "preload.cjs", "runtime.cjs", "splash.html", "splash.cjs", "settings.html", "settings.cjs", "icon.png", "package.json"],
+    "files": ["main.cjs", "preload.cjs", "runtime.cjs", "startup.cjs", "startup-worker.cjs", "splash.html", "splash.cjs", "settings.html", "settings.cjs", "user-guide.html", "icon.png", "package.json"],
     "extraResources": [{ "from": "bundle", "to": "lingxi" }],
     "publish": { "provider": "generic", "url": "https://github.com/359073395/Kivo/releases/latest/download/" },
     "win": { "target": "nsis", "icon": "icon.png", "artifactName": "Kivo-Setup-${version}.${ext}" },

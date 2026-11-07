@@ -65,11 +65,12 @@ def get_knowledge_context(message: str) -> str:
     return get_knowledge_store().context(message)
 try:
     from easel.gateway_questions import (
-        GatewayClient, GatewayQuestionError, GatewayUnsupportedError,
+        GatewayClient, GatewayQuestionError, GatewayQuestionClosedError, GatewayUnsupportedError,
         question_bridge_supported)
 except Exception:  # 兼容缺失依赖：问答题桥接降级为关闭
     GatewayClient = None  # type: ignore
     GatewayQuestionError = None  # type: ignore
+    GatewayQuestionClosedError = None  # type: ignore
     GatewayUnsupportedError = None  # type: ignore
     question_bridge_supported = None  # type: ignore
 
@@ -87,6 +88,93 @@ def _qbridge_warn_once(key: str, message: str) -> None:
         return
     _QBRIDGE_WARNED.add(key)
     print(message, file=sys.stderr, flush=True)
+
+
+def _gateway_question_timing(question: dict) -> dict:
+    return {key: value for key in ("createdAtMs", "expiresAtMs")
+            if isinstance(value := question.get(key), (int, float))
+            and not isinstance(value, bool) and 0 <= value <= 9_007_199_254_740_991}
+
+
+def _gateway_question_state(question: dict | None) -> dict:
+    if question is None:
+        return {"status": "not_found"}
+    status = question.get("status")
+    if status not in {"pending", "answered", "resolved", "cancelled", "expired", "closed"}:
+        status = "unknown"
+    return {"status": status, **_gateway_question_timing(question)}
+
+
+def _poll_gateway_questions(sk: str, proc, emit, stop: threading.Event) -> None:
+    global _QBRIDGE_DISABLED
+    if _QBRIDGE_DISABLED or GatewayClient is None:
+        return
+    if question_bridge_supported is not None and not question_bridge_supported():
+        _QBRIDGE_DISABLED = True
+        _qbridge_warn_once(
+            "unsupported", "[question-bridge] 当前 OpenClaw 版本无 question RPC（需 2026.9.x+），"
+            "已跳过 ask_user 选项卡片桥接，改用文字问答。")
+        return
+    client = None
+    pushed: set[str] = set()
+    pending: set[str] = set()
+    final_check = False
+    try:
+        try:
+            client = GatewayClient()
+            client.connect()
+        except Exception:
+            _QBRIDGE_DISABLED = True
+            _qbridge_warn_once(
+                "connect", "[question-bridge] connect gateway failed，已停用桥接（本进程），"
+                "ask_user 改用文字问答。")
+            return
+        while True:
+            try:
+                items = client.list_questions(session_key=f"agent:main:{sk}", status="pending")
+            except GatewayUnsupportedError:
+                _QBRIDGE_DISABLED = True
+                _qbridge_warn_once(
+                    "unsupported", "[question-bridge] 当前 OpenClaw 版本无 question RPC，"
+                    "已停用 ask_user 选项卡片桥接（需 2026.9.x+）。")
+                return
+            except Exception:
+                if proc.poll() is not None or stop.wait(2):
+                    return
+                continue
+            current = {item["id"] for item in items if item.get("id")}
+            for identifier in sorted(pending - current):
+                try:
+                    status = _gateway_question_state(client.get_question(identifier))["status"]
+                except GatewayQuestionClosedError as error:
+                    status = error.status
+                except GatewayUnsupportedError:
+                    status = "closed"
+                except Exception:
+                    current.add(identifier)
+                    continue
+                if status in ("pending", "unknown"):
+                    current.add(identifier)
+                    continue
+                emit("question_closed", json.dumps({"id": identifier, "status": status}))
+            for item in items:
+                identifier = item.get("id")
+                if identifier and identifier not in pushed:
+                    pushed.add(identifier)
+                    emit("question", json.dumps({
+                        "id": identifier, "questions": item.get("questions", []),
+                        "expiresAtMs": None, **_gateway_question_timing(item),
+                    }, ensure_ascii=False))
+            pending = current
+            if proc.poll() is not None or stop.is_set():
+                if pending and not final_check:
+                    final_check = True
+                    continue
+                return
+            stop.wait(2)
+    finally:
+        if client is not None:
+            client.close()
 
 PROFILES_DIR = PROJECT_ROOT / "profiles"
 SKILLS_DIR = PROJECT_ROOT / "skills"
@@ -117,7 +205,33 @@ OPENCLAW_SESSIONS_DIR = _oc_state_dir() / "agents" / "main" / "sessions"
 # 内容取决于网关——支持 extended-thinking 的网关会按档位回传思考流；不支持的（如内网 codewiz，
 # 实测 transcript 里 assistant 只有 text 块、thinking 恒为 0）面板留空，调高档位也不会有内容。
 # 默认 medium：让支持思考的部署直接显示较完整思考；EASEL_THINKING_LEVEL 可覆盖（low 提速 / high 更详尽）。
-THINKING_LEVEL = (os.environ.get("EASEL_THINKING_LEVEL", "").strip() or "medium")
+def _thinking_level_setting() -> str:
+    """思考档位：进程环境优先，其次项目根 .env。
+
+    THINKING_LEVEL 在模块导入时求值，而 .env 并不会被注入 os.environ（app 内部按需解析），
+    所以此前在 .env 里写 EASEL_THINKING_LEVEL 完全无效。对只支持特定档位的模型
+    （如 glm-5.3 仅 off/ultra）会直接报 `Thinking level "medium" is not supported` 导致对话无法开始。
+    """
+    env_val = os.environ.get("EASEL_THINKING_LEVEL", "").strip()
+    if env_val:
+        return env_val
+    try:
+        env_file = Path(os.environ.get("LINGXI_ENV_FILE") or Path(__file__).resolve().parent.parent / ".env")
+        file_value = ""
+        for line in env_file.read_text(encoding="utf-8-sig").splitlines():
+            s = line.strip()
+            if s and not s.startswith("#") and "=" in s:
+                k, _, v = s.partition("=")
+                if k.strip() == "EASEL_THINKING_LEVEL":
+                    file_value = v.strip().strip("\"'")
+        if file_value:
+            return file_value
+    except (OSError, UnicodeError):
+        pass
+    return "medium"
+
+
+THINKING_LEVEL = _thinking_level_setting()
 
 # gateway 进程把原始事件流（token/thinking/收尾）写到的**单个共享文件**。
 # 关键：`openclaw agent` 只是瘦客户端，没有 --raw-stream 标志——只有常驻 gateway 按它自己
@@ -657,11 +771,11 @@ def clean_agent_output(raw: str) -> str:
 
 def _proxy_env() -> dict[str, str]:
     """返回带外网代理的环境变量（保护内网直连）。"""
-    env = os.environ.copy()
+    from easel.runtime_env import proxy_environment
+
+    env = proxy_environment(dict(os.environ),
+                            'localhost,127.0.0.1,10.*,*.xiaohongshu.com,*.devops.xiaohongshu.com,*.douyin.com,*.kuaishou.com,*.zhihu.com,*.bilibili.com,*.weixin.qq.com,*.qq.com')
     env.setdefault('EASEL_ROOT', str(PROJECT_ROOT))
-    env.setdefault('http_proxy', os.environ.get('EASEL_PROXY', ''))
-    env.setdefault('https_proxy', os.environ.get('EASEL_PROXY', ''))
-    env.setdefault('no_proxy', 'localhost,127.0.0.1,10.*,*.xiaohongshu.com,*.devops.xiaohongshu.com,*.douyin.com,*.kuaishou.com,*.zhihu.com,*.bilibili.com,*.weixin.qq.com,*.qq.com')
     return env
 
 
@@ -956,7 +1070,7 @@ def _api_spec_status(skill: str, env: dict[str, str]) -> dict:
 
 def _agent_thinking_level() -> str:
     try:
-        data = json.loads(_oc_config_path().read_text(encoding="utf-8"))
+        data = json.loads(_oc_config_path().read_text(encoding="utf-8-sig"))
         agents = data.get("agents", {})
         reference = agents.get("defaults", {}).get("model", {})
         for agent in agents.get("list", []):
@@ -1581,7 +1695,7 @@ def _model_channels(runtime: str | None = None) -> dict:
     try:
         oc = _oc_config_path()
         if not direct and oc.is_file():
-            primary = str(json.loads(oc.read_text(encoding="utf-8"))
+            primary = str(json.loads(oc.read_text(encoding="utf-8-sig"))
                           .get("agents", {}).get("defaults", {}).get("model", {}).get("primary", ""))
     except Exception:  # noqa: BLE001
         pass
@@ -1660,7 +1774,7 @@ def _model_channels(runtime: str | None = None) -> dict:
     try:
         oc = _oc_config_path()
         if not direct and oc.is_file():
-            provs = (json.loads(oc.read_text(encoding="utf-8"))
+            provs = (json.loads(oc.read_text(encoding="utf-8-sig"))
                      .get("models", {}).get("providers", {})) or {}
             for pkey, pv in provs.items():
                 if pkey in ("openai", "anthropic", "relay") or not isinstance(pv, dict):
@@ -1882,7 +1996,7 @@ def _openclaw_provider_creds() -> dict[str, tuple[str, str]]:
     """读 openclaw.json 里每个 chat 供应商现存的 (baseUrl, apiKey)。读不到就当空表（不阻断保存）。"""
     try:
         oc = _oc_config_path()
-        provs = json.loads(oc.read_text(encoding='utf-8')).get('models', {}).get('providers', {})
+        provs = json.loads(oc.read_text(encoding='utf-8-sig')).get('models', {}).get('providers', {})
         return {k: (str(v.get('baseUrl') or ''), str(v.get('apiKey') or ''))
                 for k, v in provs.items() if isinstance(v, dict)}
     except Exception:  # noqa: BLE001
@@ -1899,7 +2013,7 @@ def _sync_openclaw_chat(provider_updates: dict[str, dict], keep_custom: set[str]
         oc = _oc_config_path()
         if not oc.is_file():
             return ''
-        data = json.loads(oc.read_text(encoding='utf-8'))
+        data = json.loads(oc.read_text(encoding='utf-8-sig'))
         providers = data.setdefault('models', {}).setdefault('providers', {})
         changed = False
         for pkey in [k for k in list(providers.keys())
@@ -1990,7 +2104,7 @@ def _sync_anthropic_provider(base: str, key: str) -> str:
         oc = _oc_config_path()
         if not oc.is_file():
             return ''
-        data = json.loads(oc.read_text(encoding='utf-8'))
+        data = json.loads(oc.read_text(encoding='utf-8-sig'))
         providers = data.setdefault('models', {}).setdefault('providers', {})
         prov = providers.get('anthropic')
         target_base = base or 'https://api.anthropic.com'
@@ -2372,7 +2486,7 @@ def _set_openclaw_primary(primary_ref: str) -> str:
         oc = _oc_config_path()
         if not oc.is_file():
             return 'openclaw.json 不存在，请先运行 bash setup.sh'
-        data = json.loads(oc.read_text(encoding='utf-8'))
+        data = json.loads(oc.read_text(encoding='utf-8-sig'))
         ref = data.setdefault('agents', {}).setdefault('defaults', {}).setdefault('model', {})
         if ref.get('primary') == primary_ref:
             return ''
@@ -2396,7 +2510,7 @@ def _declare_anthropic_provider(base: str) -> str:
         oc = _oc_config_path()
         if not oc.is_file():
             return 'openclaw.json 不存在，请先运行 bash setup.sh'
-        data = json.loads(oc.read_text(encoding='utf-8'))
+        data = json.loads(oc.read_text(encoding='utf-8-sig'))
         providers = data.setdefault('models', {}).setdefault('providers', {})
         prov = providers.get('anthropic')
         if isinstance(prov, dict) and prov.get('baseUrl') == base:
@@ -3218,7 +3332,7 @@ async def api_chat_job_stream(turn_id: str, after: int = 0):
                     # 转义 → 前端 JSON.parse 拿到字符串而非对象 → ask_user 选项
                     # 卡片渲染成空壳。其余事件存原文/dict，与实时流的 dumps 规则
                     # 一致。因此仅 question 按实时流规则原样透传。
-                    if event["event"] == "question" and isinstance(raw, str):
+                    if event["event"] in ("question", "question_closed") and isinstance(raw, str):
                         data_out = raw
                     else:
                         data_out = json.dumps(raw, ensure_ascii=False)
@@ -3538,67 +3652,17 @@ async def api_chat_stream(req: ChatRequest):
         # 背景：OpenClaw 的 ask_user 注册到 gateway 进程内，Easel 前端不消费 question RPC → 选项不可见。
         # 这里在 agent 运行期间每 2s 轮询一次，把新出现的 pending question 以 SSE `question` 事件推送，
         # 前端渲染选项卡片；用户点击后经 /api/chat/question/answer 调 question.resolve 完成回答。
+        question_stop = threading.Event()
+        question_poll_fut = None
+        question_events_open = True
+
+        def emit_question(kind: str, payload: str):
+            if question_events_open:
+                _emit(kind, _scrub_secrets(payload))
+
         if GatewayClient is not None and not _QBRIDGE_DISABLED:
-            def _question_poll():
-                global _QBRIDGE_DISABLED
-                if _QBRIDGE_DISABLED:
-                    return
-                # 版本能力门：旧版本 OpenClaw（<2026.9.x）没有 question.* RPC，连都不连——
-                # 否则每轮 connect 都在网关上触发新的 scope-upgrade 配对申请。只提示一次，走文字问答。
-                if question_bridge_supported is not None and not question_bridge_supported():
-                    _QBRIDGE_DISABLED = True
-                    _qbridge_warn_once(
-                        "unsupported",
-                        "[question-bridge] 当前 OpenClaw 版本无 question RPC（需 2026.9.x+），"
-                        "已跳过 ask_user 选项卡片桥接，改用文字问答。")
-                    return
-                client = None
-                pushed: set[str] = set()
-                try:
-                    client = GatewayClient()
-                    client.connect()
-                except Exception as e:
-                    # connect 失败（如 NOT_PAIRED/scope-upgrade，或网关不可达）：熔断整个桥接，
-                    # 不再每轮重试——否则每轮都会在网关上堆一个新的配对/权限申请。每进程只告警一次。
-                    _QBRIDGE_DISABLED = True
-                    _qbridge_warn_once(
-                        "connect",
-                        f"[question-bridge] connect gateway failed，已停用桥接（本进程），"
-                        f"ask_user 改用文字问答: {e}")
-                    return
-                try:
-                    while proc.poll() is None:
-                        try:
-                            items = client.list_questions(
-                                session_key=f"agent:main:{sk}", status="pending")
-                        except GatewayUnsupportedError as e:
-                            # 连上了但没有 question RPC（版本判断漏网时的兜底）：熔断，安静退出。
-                            _QBRIDGE_DISABLED = True
-                            _qbridge_warn_once(
-                                "unsupported",
-                                f"[question-bridge] 当前 OpenClaw 版本无 question RPC，"
-                                f"已停用 ask_user 选项卡片桥接（需 2026.9.x+）: {e}")
-                            return
-                        except Exception:
-                            time.sleep(2)
-                            continue
-                        for it in items:
-                            qid = it.get("id")
-                            if qid and qid not in pushed:
-                                pushed.add(qid)
-                                _emit("question", json.dumps({
-                                    "id": qid,
-                                    "questions": it.get("questions", []),
-                                    "expiresAtMs": it.get("expiresAtMs"),
-                                }, ensure_ascii=False))
-                        time.sleep(2)
-                finally:
-                    try:
-                        if client is not None:
-                            client.close()
-                    except Exception:
-                        pass
-            loop.run_in_executor(None, _question_poll)
+            question_poll_fut = loop.run_in_executor(
+                None, _poll_gateway_questions, sk, proc, emit_question, question_stop)
 
         def _handle(line: str):
             o = _raw_event_for_run(line, run_info["run_id"])
@@ -3724,8 +3788,14 @@ async def api_chat_stream(req: ChatRequest):
                     to_client("thinking", item["text"])
                 elif item["t"] == "activity":
                     to_client("activity", item["text"])
-                elif item["t"] == "question":
-                    to_client("question", item["text"])
+                elif item["t"] in ("question", "question_closed"):
+                    to_client(item["t"], item["text"])
+            question_stop.set()
+            if question_poll_fut is not None:
+                try:
+                    await asyncio.wait_for(asyncio.shield(question_poll_fut), timeout=2)
+                except Exception:
+                    pass
             rc = proc.poll()
             # 等 stdout 读完（stopReason 行在进程收尾时才打印，避免 _tail 先发 SENTINEL 时漏读）
             if stdout_fut is not None:
@@ -3794,6 +3864,12 @@ async def api_chat_stream(req: ChatRequest):
                         await asyncio.to_thread(proc.wait, timeout=2)
                     except (OSError, subprocess.TimeoutExpired):
                         pass
+            question_stop.set()
+            question_events_open = False
+            while not q.empty():
+                queued = q.get_nowait()
+                if queued is not SENTINEL and queued["t"] in ("question", "question_closed"):
+                    to_client(queued["t"], queued["text"])
             # 诊断日志：每次对话流收尾都记一行，供事后定位「莫名停下」到底是哪种情况。
             try:
                 DEBUG_DIR.mkdir(parents=True, exist_ok=True)
@@ -3880,8 +3956,8 @@ async def api_chat_stream(req: ChatRequest):
                 yield {"id": str(item["id"]), "event": "thinking", "data": json.dumps(item["text"], ensure_ascii=False)}
             elif t == "activity":
                 yield {"id": str(item["id"]), "event": "activity", "data": json.dumps(item["text"], ensure_ascii=False)}
-            elif t == "question":
-                yield {"id": str(item["id"]), "event": "question", "data": item["text"]}
+            elif t in ("question", "question_closed"):
+                yield {"id": str(item["id"]), "event": t, "data": item["text"]}
             elif t == "error":
                 yield {"id": str(item["id"]), "event": "error", "data": json.dumps(item["text"], ensure_ascii=False)}
             elif t == "done":
@@ -3903,12 +3979,13 @@ async def api_question_answer(req: QuestionAnswerRequest):
     if req.questionId.startswith("harness_"):
         record = _HARNESS_QUESTIONS.get(req.questionId)
         if record is None:
-            return {"ok": False, "error": "权限或问答请求已过期，请重试"}
+            return {"ok": False, "expired": True, "status": "expired",
+                    "error": "权限或问答请求已过期，请重试"}
         required = {question["questionId"] for question in record["questions"]}
         if set(req.answers or {}) != required:
             raise HTTPException(400, "回答与当前问题不匹配")
         if record["future"].done():
-            return {"ok": False, "error": "请求已回答"}
+            return {"ok": False, "expired": True, "status": "resolved", "error": "请求已回答"}
         record["future"].set_result(req.answers)
         return {"ok": True}
     if _direct_api_enabled():
@@ -3922,6 +3999,9 @@ async def api_question_answer(req: QuestionAnswerRequest):
         client.connect()
         result = client.resolve(req.questionId, req.answers or {}, req.resolvedBy)
         return {"ok": True, "result": result}
+    except GatewayQuestionClosedError as error:
+        return {"ok": False, "expired": True, "status": "expired", "reason": error.reason,
+                "error": "此问题已关闭或过期，答案未发送。请在输入框中继续对话。"}
     except Exception as e:
         return {"ok": False, "error": str(e)}
     finally:
@@ -3952,11 +4032,13 @@ async def api_question_status(req: QuestionStatusRequest):
         for qid in req.questionIds:
             try:
                 q = client.get_question(qid)
-                # QUESTION_NOT_FOUND 抛异常捕获后报 not_found；正常返回则按 status
-                out[qid] = {"status": q.get("status") if q else "not_found"}
-            except GatewayQuestionError as e:
-                # gateway 明确错：问题已清理/不存在 = 已答或已过期，一律 not_found
-                out[qid] = {"status": "not_found"}
+                out[qid] = _gateway_question_state(q)
+            except GatewayQuestionClosedError as error:
+                out[qid] = {"status": error.status}
+            except GatewayUnsupportedError:
+                return {"ok": False, "error": "gateway question status unsupported", "questions": {}}
+            except GatewayQuestionError:
+                out[qid] = {"status": "unknown"}
             except Exception:
                 out[qid] = {"status": "unknown"}   # 网络/连接异常：保持 unknown（前端保留显示，宁不缺题）
         return {"ok": True, "questions": out}

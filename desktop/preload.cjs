@@ -5,6 +5,7 @@ if (location.protocol === 'file:') {
     settings: () => ipcRenderer.invoke('desktop:settings'),
     saveUpdateUrl: (value) => ipcRenderer.invoke('desktop:save-update-url', value),
     checkUpdate: () => ipcRenderer.invoke('desktop:check-update'),
+    startupAction: (action) => ipcRenderer.invoke('desktop:startup-action', action),
     onStatus: (callback) => ipcRenderer.on('desktop:status', (_event, message) => callback(String(message))),
   });
 }

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "easel"
-version = "0.3.1"
+version = "0.3.3"
 description = "社媒内容工作流整合层 — Easel CLI"
 requires-python = ">=3.10"
 # 运行依赖统一安装，确保 Web、媒体处理和浏览器发布开箱可用。
@@ -29,12 +29,21 @@ dependencies = [
     "cryptography>=42",
 ]
 
+[project.optional-dependencies]
+# Standalone installation should use requirements-tikivo.txt; this extra keeps
+# the company report engine's tested numeric stack when installing this package.
+tikivo = ["openpyxl>=3.1.5,<4", "pandas>=2.3,<3", "numpy>=2.3,<3"]
+
 [project.scripts]
 easel = "easel.cli:main"
 lingxi = "easel.cli:main"
+tikivo = "tikivo.__main__:main"
 
 [tool.setuptools.packages.find]
-include = ["easel*", "lingxi*"]
+include = ["easel*", "lingxi*", "tikivo*"]
 
 [tool.setuptools.package-data]
 lingxi = ["domestic-methods.json"]
+tikivo = ["static/*"]
+"tikivo.company_reports" = ["SOURCE-PROVENANCE.json"]
+"tikivo.company_reports.legacy" = ["source_manifest.json", "build_report.service.py"]

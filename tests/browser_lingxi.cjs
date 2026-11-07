@@ -28,7 +28,7 @@ const path = require('node:path');
     if (await close.isVisible().catch(() => false)) await close.click();
     await page.getByRole('button', { name: '学习知识库', exact: true }).click();
     await page.getByRole('heading', { name: '让每次创作，都有知识可依' }).waitFor();
-    check('domestic_brand', (await page.title()) === 'Kivo 创作工作台');
+    check('domestic_brand', (await page.title()) === 'Kivo · 创作工作台');
     await page.getByLabel('搜索知识', { exact: true }).fill('人群定位');
     await page.locator('.lx-k-result').first().waitFor();
     await page.locator('.lx-k-result').first().click();

@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - run: node --test desktop/tests/runtime.test.cjs
+      - run: node --test desktop/tests/*.test.cjs
 
   validate-skills:
     name: Skill contracts
@@ -216,6 +216,10 @@ jobs:
           printf '\nEASEL_LLM_API_KEY=sk-ci-not-a-real-key-0123456789\n' >> .env
           printf 'EASEL_LLM_BASE_URL=https://example.invalid/v1\n' >> .env
           printf 'CLAUDE_MODEL=anthropic/claude-sonnet-4-6\n' >> .env
+
+      - name: Create installation environment (Linux)
+        if: runner.os == 'Linux'
+        run: python -m venv .venv
 
       - name: Install (Linux/macOS)
         if: runner.os != 'Windows'

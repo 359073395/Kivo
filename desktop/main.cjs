@@ -4,20 +4,31 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { spawn } = require('node:child_process');
-const { syncPlatform, syncRuntime, syncKnowledge, updateUrl, freePort } = require('./runtime.cjs');
+const { updateUrl, freePort } = require('./runtime.cjs');
+const { prepareStartup } = require('./startup.cjs');
 
 const testMode = process.env.LINGXI_DESKTOP_TEST === '1';
 if (testMode && process.env.LINGXI_DESKTOP_TEST_DATA) app.setPath('userData', path.resolve(process.env.LINGXI_DESKTOP_TEST_DATA));
 let window, preferences, server, origin = '', quitting = false, checking = false;
-let readyResolve;
-const ready = new Promise((resolve) => { readyResolve = resolve; });
+let startupFailed = false;
+const startupStarted = Date.now();
+let startupResult;
+let heartbeatLast = Date.now(), heartbeatMaxGapMs = 0;
+const heartbeat = testMode ? setInterval(() => {
+  const now = Date.now(); heartbeatMaxGapMs = Math.max(heartbeatMaxGapMs, now - heartbeatLast); heartbeatLast = now;
+}, 100) : null;
+heartbeat?.unref();
 const settingsFile = () => path.join(app.getPath('userData'), 'desktop-settings.json');
 const trustedSettingsUrl = pathToFileURL(path.join(__dirname, 'settings.html')).href;
 function config() {
   try { return { updateUrl: 'https://github.com/359073395/Kivo/releases/latest/download/', ...JSON.parse(fs.readFileSync(settingsFile(), 'utf8')) }; }
   catch { return { updateUrl: 'https://github.com/359073395/Kivo/releases/latest/download/' }; }
 }
-function status(message) { if (window && !window.isDestroyed()) window.webContents.send('desktop:status', message); }
+function status(message) {
+  if (window && !window.isDestroyed()) window.webContents.send('desktop:status', message);
+  fs.appendFile(path.join(app.getPath('userData'), 'startup.log'),
+    `${new Date().toISOString()} +${Date.now() - startupStarted}ms ${message}\n`, () => {});
+}
 function toast(title, body) { if (Notification.isSupported() && !testMode) new Notification({ title, body }).show(); }
 function stopServer() {
   if (!server || server.exitCode !== null) return;
@@ -85,6 +96,11 @@ ipcMain.handle('desktop:save-update-url', (event, input) => {
   } catch (error) { return { message: '保存失败：' + error.message }; }
 });
 ipcMain.handle('desktop:check-update', async (event) => { trusted(event); return checkUpdate(false); });
+ipcMain.handle('desktop:startup-action', (event, action) => {
+  if (event.senderFrame?.url !== pathToFileURL(path.join(__dirname, 'splash.html')).href) throw new Error('不允许此页面操作启动流程');
+  if (action === 'logs') return shell.openPath(app.getPath('userData'));
+  if (action === 'retry' && startupFailed) { app.relaunch(); app.quit(); }
+});
 
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
@@ -124,22 +140,29 @@ else {
       ] },
       { label: '编辑', submenu: [{ role: 'undo' }, { role: 'redo' }, { type: 'separator' }, { role: 'cut' }, { role: 'copy' }, { role: 'paste' }, { role: 'selectAll' }] },
       { label: '视图', submenu: [{ role: 'reload' }, { role: 'resetZoom' }, { role: 'zoomIn' }, { role: 'zoomOut' }, { role: 'togglefullscreen' }] },
-      { label: '帮助', submenu: [{ label: '关于Kivo', click: () => dialog.showMessageBox(window, { message: `Kivo 创作工作台 ${app.getVersion()}`, detail: 'Windows桌面版 · 通用API独立运行\n基于Easel，保留原作者及第三方许可。\n初版未进行代码签名，真实平台与媒体服务仍需配置。' }) }] },
+      { label: '帮助', submenu: [{ label: '新手使用指南', click: () => {
+        const guide = new BrowserWindow({ width: 1100, height: 820, parent: window,
+          webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true } });
+        guide.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+        const guideUrl = pathToFileURL(path.join(__dirname, 'user-guide.html')).href;
+        guide.webContents.on('will-navigate', (event, url) => { if (url.split('#')[0] !== guideUrl) event.preventDefault(); });
+        void guide.loadFile(path.join(__dirname, 'user-guide.html'));
+      } }, { label: '关于Kivo', click: () => dialog.showMessageBox(window, { message: `Kivo 创作工作台 ${app.getVersion()}`, detail: 'Windows桌面版 · 通用API独立运行\n基于Easel，保留原作者及第三方许可。\n初版未进行代码签名，真实平台与媒体服务仍需配置。' }) }] },
     ]));
     await window.loadFile(path.join(__dirname, 'splash.html'));
     try {
-      const bundle = app.isPackaged ? path.join(process.resourcesPath, 'lingxi') : path.join(__dirname, 'bundle');
-      status('正在校验程序，保留本机配置与学习数据…');
-      const installed = syncPlatform(bundle, app.getPath('userData'));
-      status('正在准备随App附带的运行环境…');
-      const python = syncRuntime(bundle);
-      status('正在准备本地知识库，保留个人修改…');
-      const formalVault = 'F:\\Knowledge';
+      const bundle = testMode && process.env.KIVO_TEST_BUNDLE ? path.resolve(process.env.KIVO_TEST_BUNDLE)
+        : app.isPackaged ? path.join(process.resourcesPath, 'lingxi') : path.join(__dirname, 'bundle');
+      status('正在后台校验程序，保留本机配置与学习数据…');
+      const formalVault = fs.existsSync('F:\\资料库\\01_知识库\\knowledge-base.json') ? 'F:\\资料库\\01_知识库' : 'F:\\Knowledge';
       const selectedVault = config().knowledgeRoot || process.env.LINGXI_KNOWLEDGE_ROOT || (fs.existsSync(path.join(formalVault, 'knowledge-base.json')) ? formalVault : '');
-      const localVault = path.join(app.getPath('userData'), 'knowledge-vault');
-      const knowledge = selectedVault && path.resolve(selectedVault) !== path.resolve(localVault)
-        ? { root: selectedVault, conflicts: 0 }
-        : syncKnowledge(bundle, app.getPath('userData'));
+      startupResult = await prepareStartup({ bundle, userData: app.getPath('userData'), selectedVault,
+        force: process.env.KIVO_VERIFY_FULL === '1' }, progress => {
+        status(`正在校验${progress.stage}：${progress.done} / ${progress.total}`);
+      });
+      if (quitting) return;
+      const { installed, python, knowledge } = startupResult;
+      status(`校验完成：重新校验 ${startupResult.verification.hashed}，复用 ${startupResult.verification.reused}，耗时 ${(startupResult.verification.elapsedMs / 1000).toFixed(1)} 秒`);
       const harnessConfig = path.join(installed.root, 'outputs', '_harness', 'config.json');
       if (!fs.existsSync(harnessConfig)) {
         fs.mkdirSync(path.dirname(harnessConfig), { recursive: true });
@@ -159,35 +182,45 @@ else {
       fs.closeSync(stdout);
       server.on('error', (error) => status('本机服务启动失败：' + error.message));
       let exited = false;
-      server.on('exit', () => { exited = true; if (!quitting) { status('本机服务已停止。请重新打开应用，或从数据目录查看server.log。'); toast('本机服务停止', '请重新打开应用；日志在数据文件夹。'); } });
+      server.on('exit', () => { exited = true; if (!quitting && !startupFailed) { status('本机服务已停止。请重新打开应用，或从数据目录查看server.log。'); toast('本机服务停止', '请重新打开应用；日志在数据文件夹。'); } });
       origin = `http://127.0.0.1:${port}`;
       status('正在启动内容与知识服务…');
+      let backendReady = false;
+      const backendStarted = Date.now();
       for (let attempt = 0; attempt < 160; attempt += 1) {
         if (exited) throw new Error('本机服务退出，请查看数据目录的server.log');
         try {
           const response = await fetch(origin + '/api/knowledge/status', { signal: AbortSignal.timeout(1000) });
-          if (response.ok) { readyResolve(); break; }
+          if (response.ok) { backendReady = true; break; }
         } catch { /* bounded readiness polling, no proxy or external service */ }
         if (attempt === 159) throw new Error('服务启动超时，请查看server.log');
+        if (attempt % 12 === 0) status(`正在启动内容与知识服务，已等待 ${Math.floor((Date.now() - backendStarted) / 1000)} 秒…`);
         await new Promise((resolve) => setTimeout(resolve, 250));
       }
-      await ready;
+      if (!backendReady || quitting) return;
       await window.loadURL(origin);
+      fs.writeFileSync(path.join(app.getPath('userData'), 'startup-last.json'), JSON.stringify({
+        version: app.getVersion(), ready: true, elapsedMs: Date.now() - startupStarted,
+        verification: startupResult.verification, at: new Date().toISOString(), port,
+      }, null, 2));
       if (knowledge.conflicts && !testMode) dialog.showMessageBox(window, { type: 'warning', message: `${knowledge.conflicts} 项内置知识与本地修改有冲突。`, detail: '本地版本已保留，新版放在数据目录的knowledge-incoming中，未覆盖您的修改。' });
       toast('Kivo已启动', '本机服务就绪，可以配置API并开始使用。');
       if (testMode) {
         await new Promise((resolve) => setTimeout(resolve, 1500));
         const state = await (await fetch(origin + '/api/status')).json();
         const noPrivilegedBridge = await window.webContents.executeJavaScript('typeof window.lingxiDesktop === "undefined"');
-        const report = { version: app.getVersion(), packaged: app.isPackaged, backendReady: true, runtime: state.runtime, skillCount: state.skills.length, noPrivilegedBridge, dataRoot, port };
+        const report = { version: app.getVersion(), packaged: app.isPackaged, backendReady: true, runtime: state.runtime, skillCount: state.skills.length, noPrivilegedBridge, dataRoot, port, elapsedMs: Date.now() - startupStarted, heartbeatMaxGapMs, verification: startupResult.verification };
         fs.writeFileSync(path.join(app.getPath('userData'), 'desktop-smoke.json'), JSON.stringify(report, null, 2));
         const capture = await window.webContents.capturePage();
         fs.writeFileSync(path.join(app.getPath('userData'), 'desktop-smoke.png'), capture.toPNG());
         quitting = true; stopServer(); app.quit();
       }
     } catch (error) {
-      status('启动失败：' + error.message + '\n您的账号与知识数据未删除。请查看数据文件夹中的server.log。');
-      if (!testMode) dialog.showErrorBox('Kivo启动失败', String(error.message));
+      startupFailed = true;
+      stopServer();
+      if (window && !window.isDestroyed()) await window.loadFile(path.join(__dirname, 'splash.html'));
+      status('启动失败：' + error.message + '\n您的账号与知识数据未删除。请查看数据文件夹中的startup.log和server.log。');
+      if (!testMode) toast('Kivo启动失败', '启动页已显示原因，可打开日志或重试。');
       else { fs.writeFileSync(path.join(app.getPath('userData'), 'desktop-error.txt'), String(error.stack)); stopServer(); app.exit(1); }
     }
   });
