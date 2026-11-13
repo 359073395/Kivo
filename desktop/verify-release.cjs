@@ -13,8 +13,8 @@ for (const [kind, folder] of [['platform','platform'],['runtime','python'],['kno
       if(e.isSymbolicLink()) throw new Error('Symlink in bundle: '+rel);
       if(e.isDirectory()) { walk(full,rel+'/'); continue; }
       if (!expected.has(rel)) {
-        // Builder excludes these ARM-only pip helper files from x64 packages.
-        const stagedOnly = kind === 'runtime' && /^(?:Lib\/site-packages\/(?:easel-0\.3\.0|pip-26\.1\.1)\.dist-info\/|Lib\/site-packages\/pip\/_vendor\/distlib\/[tw]64-arm(?:64)?\.exe$)|(?:^|\/)__pycache__\/|\.py[co]$/.test(rel);
+        const stagedOnly = (kind === 'platform' && e.name === '.gitkeep') ||
+          (kind === 'runtime' && /^(?:Lib\/site-packages\/(?:easel-0\.3\.0|pip-26\.1\.1)\.dist-info\/|Lib\/site-packages\/pip\/_vendor\/distlib\/[tw]64-arm(?:64)?\.exe$)|(?:^|\/)__pycache__\/|\.py[co]$/.test(rel));
         if (!stagedOnly) report.unexpected.push(kind+':'+rel);
       } else if (sha(fs.readFileSync(full)) !== expected.get(rel)) throw new Error('Hash mismatch: '+kind+':'+rel);
       if (/(^|\/)(model\.env|cookies?\.json|machine-paths\.local\.json|\.env(?!\.example$)(\.|$))|(^|\/)(outputs|profiles)\//i.test(rel)) report.forbidden.push(kind+':'+rel);

@@ -79,9 +79,9 @@ for (const file of portable.files) {
 }
 fs.copyFileSync(path.join(vaultRoot, 'PORTABLE-MANIFEST.json'), path.join(vaultOut, 'PORTABLE-MANIFEST.json'));
 const knowledgeFiles = manifest(vaultOut, 'knowledge-manifest.json');
-const platformFiles = manifest(platform, 'platform-manifest.json');
-// electron-builder strips ARM launchers from an x64 NSIS package. These pip
-// helpers are not used by x64 Python; do not require them in the integrity list,
+const platformFiles = manifest(platform, 'platform-manifest.json',
+  (relative) => path.basename(relative) !== '.gitkeep');
+// ARM pip launchers are not used by x64 Python; omit them from the integrity list,
 // including when an earlier staging directory still contains copies.
 const runtimeFiles = manifest(python, 'runtime-manifest.json',
   (relative) => !/^(?:Lib\/site-packages\/(?:easel-0\.3\.0|pip-26\.1\.1)\.dist-info\/|Lib\/site-packages\/pip\/_vendor\/distlib\/[tw]64-arm(?:64)?\.exe$)|(?:^|\/)__pycache__\/|\.py[co]$/.test(relative));

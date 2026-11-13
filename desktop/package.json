@@ -9,11 +9,13 @@
   "scripts": {
     "start": "electron .",
     "test": "node --test tests/*.test.cjs",
+    "prebuild": "node prepare-installer.cjs",
     "build": "electron-builder --win nsis --publish never"
   },
   "dependencies": { "electron-updater": "6.8.9" },
   "devDependencies": { "electron": "44.9.0", "electron-builder": "26.15.3" },
   "build": {
+    "afterPack": "after-pack.cjs",
     "appId": "app.kivo.creator",
     "productName": "Kivo",
     "directories": { "output": "dist" },
@@ -21,6 +23,6 @@
     "extraResources": [{ "from": "bundle", "to": "lingxi", "filter": ["**/*", "!python/Lib/site-packages/easel-0.3.0.dist-info/**", "!python/Lib/site-packages/pip-26.1.1.dist-info/**", "!**/__pycache__/**", "!**/*.pyc", "!**/*.pyo"] }],
     "publish": { "provider": "generic", "url": "https://github.com/359073395/Kivo/releases/latest/download/" },
     "win": { "target": "nsis", "icon": "icon.png", "artifactName": "Kivo-Setup-${version}.${ext}" },
-    "nsis": { "oneClick": false, "perMachine": false, "allowToChangeInstallationDirectory": true, "createDesktopShortcut": true, "createStartMenuShortcut": true, "deleteAppDataOnUninstall": false }
+    "nsis": { "include": "installer.nsh", "oneClick": false, "perMachine": false, "allowToChangeInstallationDirectory": true, "createDesktopShortcut": true, "createStartMenuShortcut": true, "deleteAppDataOnUninstall": false }
   }
 }
