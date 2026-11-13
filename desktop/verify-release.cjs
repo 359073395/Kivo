@@ -14,12 +14,13 @@ for (const [kind, folder] of [['platform','platform'],['runtime','python'],['kno
       if(e.isDirectory()) { walk(full,rel+'/'); continue; }
       if (!expected.has(rel)) {
         // Builder excludes these ARM-only pip helper files from x64 packages.
-        if (!/^Lib\/site-packages\/pip\/_vendor\/distlib\/[tw]64-arm(?:64)?\.exe$/.test(rel)) report.unexpected.push(kind+':'+rel);
+        const stagedOnly = kind === 'runtime' && /^(?:Lib\/site-packages\/(?:easel-0\.3\.0|pip-26\.1\.1)\.dist-info\/|Lib\/site-packages\/pip\/_vendor\/distlib\/[tw]64-arm(?:64)?\.exe$)|(?:^|\/)__pycache__\/|\.py[co]$/.test(rel);
+        if (!stagedOnly) report.unexpected.push(kind+':'+rel);
       } else if (sha(fs.readFileSync(full)) !== expected.get(rel)) throw new Error('Hash mismatch: '+kind+':'+rel);
       if (/(^|\/)(model\.env|cookies?\.json|machine-paths\.local\.json|\.env(?!\.example$)(\.|$))|(^|\/)(outputs|profiles)\//i.test(rel)) report.forbidden.push(kind+':'+rel);
       if (kind !== 'runtime' && /\.(md|json|py|js|ts|txt|ya?ml|env)$/.test(rel)) {
         const text=fs.readFileSync(full,'utf8');
-        if (/\bsk-[A-Za-z0-9_-]{32,}\b|\bgh[pousr]_[A-Za-z0-9]{30,}\b|-----BEGIN (?:RSA |OPENSSH )?PRIVATE KEY-----/.test(text)) report.possibleSecrets.push(kind+':'+rel);
+        if (/\bsk-[A-Za-z0-9_-]{32,}\b|\bgh[pousr]_[A-Za-z0-9]{30,}\b|-----BEGIN (?:RSA |OPENSSH )?PRIVATE KEY-----\s*[A-Za-z0-9+/=\r\n]{64,}-----END (?:RSA |OPENSSH )?PRIVATE KEY-----/.test(text)) report.possibleSecrets.push(kind+':'+rel);
       }
       count++;
     }

@@ -44,6 +44,7 @@ def upstream(monkeypatch, handler):
 
 @pytest.fixture
 def sandbox(tmp_path, monkeypatch):
+    monkeypatch.setenv("LINGXI_API_TOOLS", "0")
     for key in (*SETTINGS, "EASEL_CHAT_TRANSPORT", "EASEL_AGENT_RUNTIME"):
         monkeypatch.delenv(key, raising=False)
     env = tmp_path / ".env"

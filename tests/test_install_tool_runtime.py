@@ -62,6 +62,7 @@ def test_faster_whisper_check_exercises_decoding(monkeypatch, tmp_path):
     (package / '__init__.py').write_text('__version__ = "broken-decoder"\n')
     (package / 'audio.py').write_text('def decode_audio(*args, **kwargs):\n    raise TypeError("metadata_errors")\n')
     monkeypatch.setenv('PYTHONPATH', str(tmp_path))
+    monkeypatch.setenv('KIVO_PYTHON_PACKAGES', str(tmp_path))
     state = tool.check_tool(recipe('fw'), sys.executable)
     assert state['state'] == 'missing'
     assert 'metadata_errors' in (state['detail'] or '')
@@ -100,6 +101,7 @@ def test_complete_model_metadata_and_weight_size_are_required(monkeypatch, tmp_p
 
 
 @pytest.mark.parametrize('cached,expected,state', [('149.0.7790.0', '149.0.7790.0', 'ok'),
+                                                ('158.0.8127.2-remotion-v3', '158.0.8127.2', 'ok'),
                                                 ('148.0.0.0', '149.0.7790.0', 'missing')])
 def test_browser_cache_requires_matching_renderer_version_and_executable(monkeypatch, tmp_path, cached, expected, state):
     cache = tmp_path / 'node_modules/.remotion/chrome-headless-shell'

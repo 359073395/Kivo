@@ -16,7 +16,7 @@ import {
 } from './icons';
 
 interface SkillPageProps {
-  persona: string;
+  onRun: (skill: string, input: string) => void;
 }
 
 type IconC = ComponentType<{ size?: number }>;
@@ -76,7 +76,7 @@ const LAYER_DESC: Record<string, string> = {
   publish: '发布层技能', attribute: '归因层技能', general: '通用技能', other: '技能',
 };
 
-export default function SkillPage({ persona }: SkillPageProps) {
+export default function SkillPage({ onRun }: SkillPageProps) {
   const [skills, setSkills] = useState<SkillItem[]>([]);
   const [error, setError] = useState('');
   const [query, setQuery] = useState('');
@@ -111,7 +111,7 @@ export default function SkillPage({ persona }: SkillPageProps) {
       <div className="skills-page-head">
         <h1 className="page-title">技能库</h1>
         <p className="page-subtitle">
-          共 {skills.length} 个技能，按流水线层分区浏览。点卡片查看说明、就地运行；
+          共 {skills.length} 个技能，按流水线层分区浏览。点卡片查看说明并在对话中执行。
           标 <span className="badge badge-warn" style={{ padding: '1px 7px' }}>需 API</span> 的需先配置密钥
           {needApiCount > 0 && `（当前 ${needApiCount} 个待配置）`}。
         </p>
@@ -178,7 +178,7 @@ export default function SkillPage({ persona }: SkillPageProps) {
       {selected && (
         <SkillDrawer
           skillName={selected}
-          persona={persona}
+          onRun={onRun}
           onClose={() => setSelected(null)}
           onConfigured={load}
         />

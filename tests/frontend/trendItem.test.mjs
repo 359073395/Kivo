@@ -6,7 +6,8 @@ import { test } from 'node:test';
 
 const require = createRequire(new URL('../../web/frontend/package.json', import.meta.url));
 const ts = require('typescript');
-const source = readFileSync(new URL('../../web/frontend/src/components/TrendsPage.tsx', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../../web/frontend/src/components/TrendsPage.tsx', import.meta.url), 'utf8')
+  .replace('function TrendsPanel(', 'export function TrendsPanel(');
 const { outputText } = ts.transpileModule(source, {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX },
 });
@@ -15,7 +16,7 @@ const item = { id: '1', title, url: 'https://example.com/item', hot: '100' };
 const group = { platform: 'zhihu', label: '知乎', items: [item], ok: true };
 
 function setup() {
-  const values = [['zhihu'], [group], false, '', 0, new Set()];
+  const values = [[{ id: 'zhihu', label: '知乎', default: true }], ['zhihu'], true, [group], false, '', 0, new Set(), false, [], ''];
   let index = 0;
   const calls = [];
   const modules = {
@@ -23,12 +24,13 @@ function setup() {
     'react/jsx-runtime': { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) },
     '../lib/api': { createIdea: data => { calls.push(data); return Promise.resolve(); } },
     './icons': { IconFire: 'fire', IconRefresh: 'refresh', IconBookmark: 'bookmark', IconCheck: 'check', IconChat: 'chat' },
+    './TrendSourcesDialog': { __esModule: true, default: 'dialog' },
     './ContentPanel': { __esModule: true, default: 'panel' },
   };
   const exports = {};
   runInNewContext(outputText, { exports, require: name => modules[name], window: {} });
   const topics = [];
-  return { tree: exports.default({ onUseTopic: value => topics.push(value) }), calls, topics };
+  return { tree: exports.TrendsPanel({ onUseTopic: value => topics.push(value) }), calls, topics };
 }
 function nodes(tree) {
   if (Array.isArray(tree)) return tree.flatMap(nodes);
@@ -52,6 +54,6 @@ test('热点操作保留完整标题，并分别触发收藏与内容创作', as
   assert.deepEqual(app.topics, [title]);
   assert.equal(app.calls.length, 1);
   assert.equal(app.calls[0].title, title);
-  assert.equal(app.calls[0].source, '知乎热搜');
+  assert.equal(app.calls[0].source, '知乎');
   assert.equal(app.calls[0].status, 'pending');
 });

@@ -173,10 +173,12 @@ else {
       if (!fs.existsSync(envPath)) fs.writeFileSync(envPath, '# Kivo桌面版本机配置，不进入安装包。\n');
       const knowledgeRoot = knowledge.root;
       const dataRoot = config().knowledgeDataRoot || path.join(app.getPath('userData'), 'knowledge');
+      const pythonPackages = path.join(app.getPath('userData'), 'python-packages');
       const stdout = fs.openSync(path.join(app.getPath('userData'), 'server.log'), 'a');
       server = spawn(python, [path.join(installed.root, 'desktop', 'backend.py')], {
         cwd: installed.root, windowsHide: true, stdio: ['ignore', stdout, stdout],
         env: { ...process.env, EASEL_PORT: String(port), LINGXI_ENV_FILE: envPath, KIVO_PLATFORM_ROOT: installed.root,
+          KIVO_PYTHON_PACKAGES: pythonPackages, PIP_TARGET: pythonPackages,
           LINGXI_KNOWLEDGE_ROOT: knowledgeRoot, LINGXI_DATA_ROOT: dataRoot, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8' },
       });
       fs.closeSync(stdout);

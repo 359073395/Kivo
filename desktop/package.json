@@ -18,7 +18,7 @@
     "productName": "Kivo",
     "directories": { "output": "dist" },
     "files": ["main.cjs", "preload.cjs", "runtime.cjs", "startup.cjs", "startup-worker.cjs", "splash.html", "splash.cjs", "settings.html", "settings.cjs", "user-guide.html", "icon.png", "package.json"],
-    "extraResources": [{ "from": "bundle", "to": "lingxi" }],
+    "extraResources": [{ "from": "bundle", "to": "lingxi", "filter": ["**/*", "!python/Lib/site-packages/easel-0.3.0.dist-info/**", "!python/Lib/site-packages/pip-26.1.1.dist-info/**", "!**/__pycache__/**", "!**/*.pyc", "!**/*.pyo"] }],
     "publish": { "provider": "generic", "url": "https://github.com/359073395/Kivo/releases/latest/download/" },
     "win": { "target": "nsis", "icon": "icon.png", "artifactName": "Kivo-Setup-${version}.${ext}" },
     "nsis": { "oneClick": false, "perMachine": false, "allowToChangeInstallationDirectory": true, "createDesktopShortcut": true, "createStartMenuShortcut": true, "deleteAppDataOnUninstall": false }

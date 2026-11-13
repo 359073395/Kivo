@@ -164,12 +164,13 @@ def _check_shell(directory: str) -> tuple[bool, str]:
     cache = Path(directory) / 'node_modules/.remotion/chrome-headless-shell'
     try:
         version = (cache / 'VERSION').read_text().strip()
-        if not re.fullmatch(r'\d+\.\d+\.\d+\.\d+', version):
+        revision = re.fullmatch(r'(\d+\.\d+\.\d+\.\d+)(?:-remotion-v\d+)?', version)
+        if not revision:
             return False, '浏览器下载未完成（版本记录无效）'
         renderer_metadata = Path(directory) / 'node_modules/@remotion/renderer/dist/browser/get-chrome-download-url.js'
         with renderer_metadata.open(encoding='utf-8') as source:
             expected = re.search(r"TESTED_VERSION\s*=\s*['\"]([0-9.]+)['\"]", source.read(128 * 1024))
-        if not expected or expected.group(1) != version:
+        if not expected or expected.group(1) != revision.group(1):
             return False, '浏览器缓存版本与已安装的 Remotion 不一致'
         machine = platform.machine().lower()
         platform_id = ('win64' if sys.platform == 'win32' else
@@ -181,7 +182,7 @@ def _check_shell(directory: str) -> tuple[bool, str]:
             executable = folder / name
             if executable.is_file() and executable.stat().st_size:
                 result = _run([str(executable), '--version'], timeout=15)
-                if result.returncode == 0 and version in (result.stdout or result.stderr):
+                if result.returncode == 0 and revision.group(1) in (result.stdout or result.stderr):
                     return True, version
         return False, '浏览器可执行文件缺失或不可运行'
     except (OSError, ValueError, subprocess.SubprocessError):

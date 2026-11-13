@@ -16,7 +16,8 @@ dependencies = [
     "pydantic>=2.7,<3",         # 请求模型
     "segno>=1.6,<2",             # B站扫码登录二维码渲染（纯 Python）
     "python-multipart>=0.0.9,<1", # FastAPI 文件上传 / Form
-    "Pillow>=10,<13", "opencv-python>=4.8,<5", "numpy>=1.26,<3",
+    "Pillow>=10,<14", "opencv-python>=4.8,<5", "numpy>=1.26,<3",
+    "PyMuPDF>=1.26.7,<2",       # 论文原图截图与论文视频资产提取
     "pandas>=2,<4", "matplotlib>=3.8,<4", "librosa>=0.10,<1",
     "faster-whisper>=1,<2", "av>=11,<19", "edge-tts>=6,<8", "playwright>=1.45,<2",
     "rembg>=2.0,<3", "biliup>=1,<2", "jieba>=0.42,<1", "snownlp>=0.12,<1",

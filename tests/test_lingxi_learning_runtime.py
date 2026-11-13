@@ -132,6 +132,70 @@ def sse(*events):
     return "".join("data: " + (e if isinstance(e, str) else json.dumps(e)) + "\n\n" for e in events)
 
 
+def test_builtin_scripts_and_media_commands_execute_with_approval(tmp_path, monkeypatch):
+    script = tmp_path / "skills/builtin/video-test/scripts/render.py"
+    script.parent.mkdir(parents=True)
+    (script.parent.parent / "SKILL.md").write_text("# Video", encoding="utf-8")
+    script.write_text("import os; print('rendered', os.environ.get('https_proxy'))", encoding="utf-8")
+    for key in ("https_proxy", "HTTPS_PROXY", "http_proxy", "HTTP_PROXY"):
+        monkeypatch.delenv(key, raising=False)
+    monkeypatch.setenv("EASEL_PROXY", "http://127.0.0.1:19876")
+    requests = []
+
+    async def approve(request):
+        requests.append(json.loads(request["command"]))
+        return True
+
+    async def check():
+        tools = runtime.ProjectTools("media", root=tmp_path, approve=approve)
+        result = await tools.call("run_builtin_script", {
+            "path": script.relative_to(tmp_path).as_posix(), "args": [], "purpose": "render"})
+        assert result["exitCode"] == 0 and "rendered http://127.0.0.1:19876" in result["stdout"]
+        result = await tools.call("run_project_command", {
+            "command": ["python", "-c", "from pathlib import Path; print(Path.cwd().name)"],
+            "cwd": "skills/builtin/video-test", "purpose": "check working directory"})
+        assert result["exitCode"] == 0 and result["stdout"].strip() == "video-test"
+        assert requests[-1]["cwd"] == str(script.parent.parent)
+        with pytest.raises(ValueError):
+            await tools.call("run_project_command", {"command": ["python"], "cwd": "../outside"})
+        tools.approve = None
+        assert not (await tools.call("run_project_command", {
+            "command": ["python", "-c", "raise AssertionError"], "cwd": "."}))["executed"]
+
+    asyncio.run(check())
+
+
+def test_media_source_files_can_be_created_and_revised_without_lost_updates(tmp_path):
+    async def check():
+        tools = runtime.ProjectTools("media", root=tmp_path)
+        created = await tools.call("save_artifact", {"name": "video/src/Main.tsx", "text": "export const value = 1;\r\n"})
+        read = await tools.call("read_project_file", {"path": "outputs/" + created["path"]})
+        assert read["sha256"] == created["sha256"]
+        updated = await tools.call("save_artifact", {
+            "name": "video/src/Main.tsx", "text": "export const value = 2;\n", "expected_sha256": read["sha256"]})
+        assert updated["updated"] and not updated["created"]
+        with pytest.raises(ValueError, match="作品已变化"):
+            await tools.call("save_artifact", {
+                "name": "video/src/Main.tsx", "text": "stale", "expected_sha256": read["sha256"]})
+        for name in ("../escape.py", "/escape.py", "nested/.env", "nested/../../escape.py"):
+            with pytest.raises(ValueError):
+                await tools.call("save_artifact", {"name": name, "text": "escape"})
+    asyncio.run(check())
+
+
+def test_api_video_pipeline_uses_the_active_project_outputs(tmp_path, monkeypatch):
+    import importlib.util
+    script = Path(__file__).resolve().parents[1] / 'skills/builtin/video-production/scripts/video_pipeline.py'
+    spec = importlib.util.spec_from_file_location('api_video_pipeline', script)
+    pipeline = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(pipeline)
+    (tmp_path / 'easel').mkdir()
+    (tmp_path / 'skills/builtin').mkdir(parents=True)
+    monkeypatch.setenv('EASEL_AGENT_RUNTIME', 'api')
+    monkeypatch.setenv('EASEL_ROOT', str(tmp_path))
+    assert pipeline._workspace_root() == tmp_path.resolve()
+
+
 def chunk(**delta):
     return {"choices": [{"delta": delta, "finish_reason": None}]}
 
@@ -168,6 +232,27 @@ def test_generic_api_real_tool_cycle_and_history(local, tmp_path, monkeypatch):
     assert events[-1] == ("finish", "stop")
     assert len(seen) == 2 and json.loads(history.read_text(encoding="utf-8"))[-2]["role"] == "tool"
     assert len(list((tmp_path / "outputs").rglob("test.md"))) == 1
+
+
+def test_api_workflow_can_continue_past_twelve_tool_rounds(local, tmp_path, monkeypatch):
+    tools = runtime.ProjectTools("long-workflow", root=tmp_path)
+    rounds = []
+
+    def respond(request):
+        rounds.append(json.loads(request.content))
+        if len(rounds) <= 13:
+            return httpx.Response(200, text=sse(chunk(tool_calls=[{
+                "index": 0, "id": f"call{len(rounds)}", "function": {"name": "list_skills", "arguments": "{}"}
+            }]), finish("tool_calls"), "[DONE]"))
+        return httpx.Response(200, text=sse(chunk(content="工作流完成"), finish("stop"), "[DONE]"))
+
+    mock_api(monkeypatch, respond)
+
+    async def collect():
+        return [event async for event in runtime.stream_agent(SETTINGS, "执行制作流程", system="", tools=tools)]
+
+    assert asyncio.run(collect())[-1] == ("finish", "stop")
+    assert len(rounds) == 14
 
 
 @pytest.mark.parametrize("response", [httpx.Response(401, text="local-test-secret"), httpx.Response(200, text="data: not-json\n\n"), httpx.Response(200, text=sse(chunk(content="不完整"), "[DONE]"))])

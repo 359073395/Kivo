@@ -66,7 +66,7 @@ def _workspace_root() -> Path:
     优先走 Easel 的统一解析器；本文件也会被同步进 workspace 单独跑，那时 import 不到，
     退化成「两套布局里挑一个已经有东西的」，再不行才按新布局。
     """
-    if os.environ.get("EASEL_AGENT_RUNTIME", "").strip().lower() in ("codex", "opencode", "acp"):
+    if os.environ.get("EASEL_AGENT_RUNTIME", "").strip().lower() in ("api", "codex", "opencode", "acp"):
         root = Path(os.environ.get("EASEL_ROOT") or Path.cwd()).resolve()
         if (root / "easel").is_dir() and (root / "skills" / "builtin").is_dir():
             return root

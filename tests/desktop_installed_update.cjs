@@ -35,7 +35,9 @@ const { inside, sha } = require('../desktop/runtime.cjs');
         noPrivilegedBridge: typeof window.lingxiDesktop === 'undefined', knowledge };
     });
     assert.equal(state.runtime, 'api');
-    assert.equal(state.skillCount, 114);
+    const bundledSkills = fs.readdirSync(path.join(bundle, 'platform', 'skills', 'builtin'))
+      .filter(name => fs.existsSync(path.join(bundle, 'platform', 'skills', 'builtin', name, 'SKILL.md')));
+    assert.equal(state.skillCount, bundledSkills.length);
     assert.equal(state.noPrivilegedBridge, true);
     await page.screenshot({ path: path.join(output, 'installed-normal.png') });
     const opened = app.waitForEvent('window');

@@ -43,14 +43,15 @@ Windows桌面版、本地网页版共用同一内容工作流。保留原来的1
 核心源代码继续位于 `lingxi/`、`easel/`、`web/` 与 `skills/`，`desktop/` 为桌面壳、用户数据保护及安装构建。技术目录/环境变量保留旧名以兼容现有数据，不意味着仍依赖旧客户端。
 
 ```powershell
-python -m venv .venv
+py -3.14 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-desktop.txt
 npm.cmd ci --prefix web/frontend
 npm.cmd run build --prefix web/frontend
 npm.cmd ci --prefix desktop
 .\desktop\Prepare-Python.ps1
+.\desktop\Prepare-Media.ps1
 node desktop/prepare.cjs
 npm.cmd run build --prefix desktop
 ```
 
-代码和原始知识副本保留各自来源、许可证与证据状态；公开不等于所有课程观点都被验证，也不自动改变原作者权利。海外版仍等待用户设计。
+Kivo 保留 Easel 的全量技能与平台入口，并加入本地知识库和独立 API 引擎。代码与知识资料沿用各自来源、许可证及证据状态。
