@@ -1,5 +1,11 @@
 !include "${PROJECT_DIR}\installer-tool.nsh"
 
+!macro customInit
+  # Release the installer's working-directory handle before the old
+  # uninstaller atomically moves the installation directory.
+  SetOutPath $TEMP
+!macroend
+
 !macro customInstall
   # NSIS CopyFiles can omit deeply nested Node.js dependencies. Extract the
   # embedded payload with native 7-Zip before reporting a successful install.
