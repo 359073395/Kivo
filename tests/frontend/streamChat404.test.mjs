@@ -13,6 +13,11 @@ const { outputText } = ts.transpileModule(source, {
     target: ts.ScriptTarget.ES2022,
   },
 });
+const personaSource = readFileSync(new URL('../../web/frontend/src/lib/personas.ts', import.meta.url), 'utf8');
+const personaExports = {};
+runInNewContext(ts.transpileModule(personaSource, {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+}).outputText, { exports: personaExports });
 
 /**
  * streamChat 回归：首发 POST 5xx → jobs 流 404 必须**终结**并触发 onError。
@@ -25,7 +30,7 @@ function loadApi(fetchImpl) {
   const module = { exports: {} };
   const sandbox = {
     exports: module.exports,
-    require: (name) => require(name),
+    require: (name) => name === './personas' ? personaExports : require(name),
     console,
     window: { location: { pathname: '/' } },
     AbortController,

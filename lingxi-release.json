@@ -1,15 +1,15 @@
 {
   "name": "Kivo · 创作工作台",
   "edition": "domestic",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "upstream": "https://github.com/ZJU-REAL/Easel",
   "upstreamCommit": "8d08b216105bd7c7057c84c97cd637cec44db609",
   "upstreamVersion": "0.3.0",
   "scope": "保留原平台功能，增加反馈自学习、手动知识和通用API独立工具引擎",
   "overseas": "awaiting_user_design",
   "upstreamPatchReview": {
-    "reviewedThrough": "5c12e42e9019d276368130b52385b770749ffa6f",
-    "date": "2026-11-07",
+    "reviewedThrough": "9eaec64a35858405dedacf8ab2627b53fe65b467",
+    "date": "2026-11-13",
     "mode": "selected-stability-backports",
     "areas": [
       "chat-lifecycle",
@@ -17,7 +17,12 @@
       "windows-config-and-proxy",
       "profile-bootstrap",
       "skill-sync-and-context-diagnostics",
-      "media-checkpoints-and-subtitles-and-audio"
+      "media-checkpoints-and-subtitles-and-audio",
+      "profile-recovery",
+      "media-runtime-checks",
+      "model-auth-and-openclaw-defaults",
+      "workspace-resolution",
+      "dashboard-trends-and-skills-layout"
     ]
   }
 }

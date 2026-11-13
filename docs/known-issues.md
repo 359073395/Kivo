@@ -99,3 +99,9 @@ bash setup.sh
 ```
 
 升级后 `easel doctor` 会校验 OpenClaw ≥ 2026.6.11。不升级时安装不再报错，但请求超时受旧版默认超时限制；请确认模型名带 provider 前缀（如 `anthropic/claude-sonnet-4-6`），具体卡在哪一步可看 `easel gateway logs`。
+
+## 后台通知、模型配置与环境体检
+
+- **后台 exec 完成后反复续跑（#163）**：安装器在配置缺项时设置 `tools.exec.notifyOnExit=false`、`tools.loopDetection.enabled=true` 和 `agents.defaults.compaction.maxActiveTranscriptBytes=1mb`，已有显式选择保留，版本不支持的字段会报告。问候、概念解释和技能用途询问不自动启动制作、登录或素材扫描；等待扫码或关键确认时结束本轮。后台完成通知不是新的用户指令。`easel doctor` 展示文件中的设置，不能据此认定运行中的网关已加载。没有新增任务工具次数上限；`usage.totalTokens` / `cacheRead` 不等同于实际账单。
+- **模型认证与辅助模型配置（#175）**：`EASEL_THINKING_LEVEL` 已支持项目 `.env`，进程环境优先。GLM 名称不应附带 `[1M]` 等上下文标注；Web 保存与 doctor 会检查，使用服务商返回的实际 ID。占位 Key 不作为可用认证。兼容网关需要 `Authorization: Bearer` 时，在 Relay 配置中显式使用 `EASEL_LLM_API_KEY_HEADER=Authorization` 和 `EASEL_LLM_API_KEY_PREFIX=Bearer`，不硬编码网关地址或密钥。安装器仅在 `utilityModel` 缺失且已有主模型时使用该主模型；已有辅助模型保留，旧版本不支持时跳过并报告。可用 `.env` 的 `EASEL_OPENCLAW_UTILITY_MODEL` 选择辅助模型后重新运行安装配置。排障时仅分享脱敏状态，不公开完整请求头、Cookie 或原始抓包。
+- **环境安装显示不符（#189）**：检测和安装优先使用当前 venv 的 Python，B站调用同环境的 `python -m biliup`。faster-whisper 检查会实际解码一秒静音音频，兼容依赖限制为 `av<19`，不加载大型模型。large-v3 检查模型权重体积与配置文件，半截下载不会标为齐全。Remotion 默认使用仓库内置工程，浏览器安装先确认工程依赖；缓存版本须匹配 renderer，并检查当前系统对应的可执行文件。浏览器首次下载仍由 Remotion 支持的下载源和网络环境决定，不使用未经该版本支持的镜像参数；离线缓存也必须匹配版本。模型文件齐全不代表已经完成真实转录或 GPU 推理验证。
