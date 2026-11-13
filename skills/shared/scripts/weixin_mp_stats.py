@@ -267,7 +267,9 @@ def _run_login(a):
     qr_out = a.qr_out or str(LOGIN_DIR / "wechat-oa-mp.png")
     login_state.write_status(status, "starting", "启动 mp 后台登录…")
     with sync_playwright() as p:
-        ctx = _launch(p, a.headed, a.profile_base, _proxy(a.proxy, a.no_proxy))
+        ctx = login_state.launch_browser(
+            _launch, p, a.headed, a.profile_base, _proxy(a.proxy, a.no_proxy),
+            status_file=status)
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
         try:
             page.goto(MP_HOME, wait_until="commit", timeout=60000)

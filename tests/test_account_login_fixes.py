@@ -1,5 +1,6 @@
 import io
 import signal
+import subprocess
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -16,6 +17,43 @@ import web_publisher
 import xhs_publish
 import douyin_publish
 import weixin_mp_stats
+
+
+@pytest.mark.parametrize("error_message", [
+    "Executable doesn't exist at browser.exe",
+    "Failed to launch chromium because executable doesn't exist at browser.exe",
+])
+def test_login_downloads_missing_browser_with_current_python(tmp_path, monkeypatch, error_message):
+    context = object()
+    launch = Mock(side_effect=[RuntimeError(error_message), context])
+    install = Mock()
+    monkeypatch.setattr(login_state.subprocess, "run", install)
+    status = str(tmp_path / "login.json")
+    assert login_state.launch_browser(launch, "profile", headless=True, status_file=status) is context
+    install.assert_called_once_with(
+        [sys.executable, "-m", "playwright", "install", "chromium"], check=True, timeout=1800)
+    assert launch.call_count == 2
+    launch.assert_called_with("profile", headless=True)
+    assert login_state.read_status(status)["state"] == "starting"
+
+
+def test_login_reports_browser_download_failure(tmp_path, monkeypatch):
+    launch = Mock(side_effect=RuntimeError("Executable doesn't exist at browser.exe"))
+    monkeypatch.setattr(login_state.subprocess, "run", Mock(side_effect=subprocess.TimeoutExpired("install", 1800)))
+    status = str(tmp_path / "login.json")
+    with pytest.raises(RuntimeError, match="浏览器组件下载失败"):
+        login_state.launch_browser(launch, status_file=status)
+    launch.assert_called_once()
+    assert login_state.read_status(status)["state"] == "error"
+
+
+def test_login_preserves_unrelated_browser_error(monkeypatch):
+    launch = Mock(side_effect=RuntimeError("profile is locked"))
+    install = Mock()
+    monkeypatch.setattr(login_state.subprocess, "run", install)
+    with pytest.raises(RuntimeError, match="profile is locked"):
+        login_state.launch_browser(launch)
+    install.assert_not_called()
 
 
 def account_element(name="Me", avatar="https://example.test/avatar.png", visible=True):

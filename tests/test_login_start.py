@@ -7,6 +7,20 @@ import pytest
 import web.app as web
 
 
+@pytest.mark.parametrize("desktop", [True, False])
+def test_xhs_desktop_login_opens_browser_window(tmp_path, monkeypatch, desktop):
+    monkeypatch.setattr(web, "LOGIN_DIR", tmp_path)
+    monkeypatch.setattr(web, "LOGIN_PROCESSES", {})
+    monkeypatch.setattr(web, "_WHOAMI_CACHE", {})
+    monkeypatch.setattr(web, "_LOGIN_START_LOCKS", {})
+    monkeypatch.setenv("KIVO_PLATFORM_ROOT", str(tmp_path) if desktop else "")
+    launch = Mock(return_value=SimpleNamespace(poll=lambda: None))
+    monkeypatch.setattr(web.subprocess, "Popen", launch)
+    result = asyncio.run(web.api_login_start("xiaohongshu"))
+    assert result["state"] == "starting"
+    assert ("--headed" in launch.call_args.args[0]) is desktop
+
+
 @pytest.mark.parametrize("platform", ["xiaohongshu", "zhihu", "wechat-oa"])
 def test_login_start_returns_without_waiting_for_qr(tmp_path, monkeypatch, platform):
     monkeypatch.setattr(web, "LOGIN_DIR", tmp_path)

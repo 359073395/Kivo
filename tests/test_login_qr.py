@@ -320,7 +320,11 @@ def test_zhihu_requires_visible_account_and_no_login_wall(visible, wall, expecte
     assert web_publisher._is_logged_in(page, web_publisher.PLATFORMS["zhihu"]) is expected
 
 
-def test_zhihu_switches_to_qr_only_when_missing(tmp_path):
+@pytest.mark.parametrize("platform,qr_selector", [
+    ("zhihu", ".Qrcode-img"),
+    ("kuaishou", "[class*=qrcode] img[src^='data:image']"),
+])
+def test_platform_switches_to_qr_only_when_missing(tmp_path, platform, qr_selector):
     ready = False
     clicked = []
 
@@ -329,13 +333,13 @@ def test_zhihu_switches_to_qr_only_when_missing(tmp_path):
         ready = True
         clicked.append(True)
 
-    cfg = web_publisher.PLATFORMS["zhihu"]
+    cfg = web_publisher.PLATFORMS[platform]
     button = SimpleNamespace(is_visible=lambda: True, click=click)
 
     def query(selector):
         if selector == cfg["login_qr_switch"]:
             return [button]
-        if selector == ".Qrcode-img" and ready:
+        if selector == qr_selector and ready:
             return [qr_element()]
         return []
 

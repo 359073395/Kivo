@@ -75,8 +75,8 @@ PLATFORMS: dict[str, dict] = {
         # 快手真扫码在 passport 域（URL 已判），cp 站已登录靠 login_check
         "logged_out_selector": ".login-container, [class*=qrcode] img[src^='data:image']",
         # 快手登录页是营销落地页，需点『立即登录』跳 passport 再切『扫码登录』才出二维码
-        "login_prep": [{"click": "text=立即登录"}, {"wait": 3000},
-                       {"click": "text=扫码登录"}, {"wait": 2500}],
+        "login_prep": [{"click": "text=立即登录"}],
+        "login_qr_switch": ".platform-switch:has-text('扫码登录')",
         # 二维码本体优先（passport 扫码码多为 base64 img / canvas，异步渲染）
         "login_qr_selector": "[class*=qrcode] img[src^='data:image'], [class*=qrcode] canvas, "
                              "[class*=qrcode] img, [class*=qr-login] img, [class*=qrcode]",
@@ -1344,9 +1344,10 @@ def cmd_login_qr(a) -> int:
 
         try:
             signal.signal(signal.SIGTERM, stop_login)
-            browser = p.chromium.launch_persistent_context(
-                str(profile), headless=True, locale="zh-CN",
-                args=LAUNCH_ARGS + ["--no-proxy-server"])
+            browser = login_state.launch_browser(
+                p.chromium.launch_persistent_context, str(profile),
+                headless=True, locale="zh-CN", args=LAUNCH_ARGS + ["--no-proxy-server"],
+                status_file=sf)
             page = browser.pages[0] if browser.pages else browser.new_page()
             _block_heavy(browser, a.platform)
             _observe_channels_account(browser, cfg)
@@ -1371,6 +1372,7 @@ def cmd_login_qr(a) -> int:
             for step in cfg.get("login_prep", []):
                 try:
                     if "click" in step:
+                        page.wait_for_selector(step["click"], state="visible", timeout=10000)
                         for el in page.query_selector_all(step["click"]):
                             if el.is_visible():
                                 el.click(timeout=3000)

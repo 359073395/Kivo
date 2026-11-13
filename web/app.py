@@ -4524,6 +4524,8 @@ async def _start_login(platform: str, restart: bool = False):
     if backend == 'xhs':
         cmd = [sys.executable, str(SHARED_SCRIPTS / 'xhs_publish.py'), 'login', '--no-proxy',
                '--qr-out', str(qr), '--status-file', str(status), '--timeout', str(LOGIN_TIMEOUT)]
+        if os.environ.get('KIVO_PLATFORM_ROOT'):
+            cmd.append('--headed')
     elif backend == 'biliup':
         # B站：TV 端扫码登录 API 生成二维码 + 写 biliup cookie（biliup login 需真终端，前端用不了）
         cmd = [sys.executable, str(SHARED_SCRIPTS / 'bili_login.py'), 'login',

@@ -1108,9 +1108,12 @@ def cmd_login(a) -> int:
     try:
         with sync_playwright() as p:
             try:
-                ctx = _launch(p, headed=a.headed, base=a.profile_base, proxy=_proxy(a.proxy, a.no_proxy))
+                ctx = login_state.launch_browser(
+                    _launch, p, headed=a.headed, base=a.profile_base,
+                    proxy=_proxy(a.proxy, a.no_proxy), status_file=sf)
             except Exception as e:
-                login_state.write_status(sf, "error", "浏览器没能打开。请关闭弹窗，等 10 秒再点登录，不要连点。")
+                detail = str(e).partition("\n")[0]
+                login_state.write_status(sf, "error", f"浏览器启动失败：{detail}")
                 _die(f"启动浏览器失败：{e}", 1)
             page = ctx.pages[0] if ctx.pages else ctx.new_page()
             try:
@@ -1121,7 +1124,7 @@ def cmd_login(a) -> int:
                 if a.headed:
                     login_state.write_status(
                         sf, "window_login",
-                        "请在弹出的 CloakBrowser 窗口里扫码，不要关掉那个窗口。")
+                        "请在弹出的浏览器窗口里扫码，不要关掉那个窗口。")
                 explore_failed = False
                 try:
                     page.goto(EXPLORE_URL, wait_until="commit", timeout=30000)
@@ -1159,12 +1162,12 @@ def cmd_login(a) -> int:
                         raise
                     login_state.write_status(
                         sf, "window_login",
-                        f"{error}。请在弹出的 CloakBrowser 窗口里完成登录（扫码或短信），不要关掉那个窗口。")
+                        f"{error}。请在弹出的浏览器窗口里完成登录（扫码或短信），不要关掉那个窗口。")
                 if qr:
                     if a.headed:
                         login_state.write_status(
                             sf, "window_login",
-                            "请在弹出的 CloakBrowser 窗口里扫码，不要关掉那个窗口。也可以扫下面这张图。",
+                            "请在弹出的浏览器窗口里扫码，不要关掉那个窗口。也可以扫下面这张图。",
                             qr=str(qr_out))
                     else:
                         login_state.write_status(sf, "qr_ready", "二维码已就绪，请扫码", qr=str(qr_out))

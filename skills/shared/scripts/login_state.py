@@ -12,12 +12,32 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import time
 
 STATES = ("starting", "qr_ready", "window_login", "scanned", "sms_required", "verifying",
           "success", "expired", "error")
+
+
+def launch_browser(launch, *args, status_file: str | None = None, **kwargs):
+    """缺少 Playwright 内核时安装当前 Python 对应的版本，再重试一次。"""
+    try:
+        return launch(*args, **kwargs)
+    except Exception as error:
+        if "executable doesn't exist" not in str(error).lower():
+            raise
+    write_status(status_file, "starting", "正在下载登录所需的浏览器组件，首次准备可能需要几分钟…")
+    try:
+        subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"],
+                       check=True, timeout=1800)
+    except (OSError, subprocess.SubprocessError) as error:
+        message = "浏览器组件下载失败，请检查网络后重新登录，或在环境页面安装 Playwright Chromium。"
+        write_status(status_file, "error", message)
+        raise RuntimeError(message) from error
+    write_status(status_file, "starting", "浏览器组件已就绪，正在打开登录页面…")
+    return launch(*args, **kwargs)
 
 
 def configure_stdio() -> None:

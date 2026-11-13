@@ -980,7 +980,9 @@ def _run_login(a) -> int:
                                "请在弹出的浏览器窗口里用抖音 App 扫码，不要关掉那个窗口。")
 
     with sync_playwright() as p:
-        ctx = _launch(p, headed=a.headed, base=a.profile_base, proxy=_proxy(a.proxy, a.no_proxy))
+        ctx = login_state.launch_browser(
+            _launch, p, headed=a.headed, base=a.profile_base,
+            proxy=_proxy(a.proxy, a.no_proxy), status_file=sf)
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
         try:
             try:
