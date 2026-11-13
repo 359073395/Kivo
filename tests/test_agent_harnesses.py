@@ -505,7 +505,11 @@ def test_rpc_cleanup_kills_descendants_that_ignore_term(tmp_path):
     child_pid = asyncio.run(exercise())
     for attempt in range(100):
         status = Path(f"/proc/{child_pid}/stat")
-        if not status.exists() or status.read_text().split()[2] == "Z":
+        try:
+            state = status.read_text().split()[2]
+        except (FileNotFoundError, ProcessLookupError):
+            break
+        if state == "Z":
             break
         __import__("time").sleep(0.02)
     else:
