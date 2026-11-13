@@ -12,3 +12,19 @@
     Quit
   ${EndIf}
 !macroend
+
+!macro customRemoveFiles
+  # Move the whole directory on its own volume. Per-file moves into TEMP fail
+  # for long dependency paths and when TEMP lives on another drive.
+  SetOutPath $TEMP
+  GetFullPathName $R1 "$INSTDIR\.."
+  GetTempFileName $R0 "$R1"
+  Delete "$R0"
+  ClearErrors
+  Rename "$INSTDIR" "$R0"
+  ${If} ${Errors}
+    Abort "无法移除旧版 Kivo，请关闭 Kivo 后重试。"
+  ${EndIf}
+  # Extended Windows paths retain deeply nested media dependencies.
+  RMDir /r /REBOOTOK "\\?\$R0"
+!macroend
