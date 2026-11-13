@@ -4,7 +4,8 @@ const path = require('node:path');
 const { verificationContext, syncPlatform, syncRuntime, syncKnowledge } = require('./runtime.cjs');
 
 try {
-  const { bundle, selectedVault, force } = workerData;
+  const { selectedVault, force } = workerData;
+  const bundle = fs.realpathSync.native(workerData.bundle);
   fs.mkdirSync(workerData.userData, {recursive:true});
   const cache = path.join(workerData.userData, 'startup-verification.json');
   fs.closeSync(fs.openSync(cache, 'a'));

@@ -25,3 +25,11 @@ test('packaging accepts every manifest file present', async t => {
 test('packaging rejects dependencies removed by builder filters', async t => {
   await assert.rejects(afterPack(fixture(t, 'platform')), /Packaged dependency is missing/);
 });
+
+test('packaging rejects unlisted private collector configuration', async t => {
+  const context = fixture(t);
+  const config = path.join(context.appOutDir, 'resources/lingxi/platform/config');
+  fs.mkdirSync(config);
+  fs.writeFileSync(path.join(config, 'trend-sources.json'), '{"private":"secret"}');
+  await assert.rejects(afterPack(context), /Packaged user configuration is forbidden/);
+});

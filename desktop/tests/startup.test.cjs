@@ -44,6 +44,18 @@ test('cache cannot hide changed runtime bytes, even if mtime is restored', async
   fs.writeFileSync(target, 'changed'); fs.utimesSync(target, old.atime, old.mtime);
   await assert.rejects(prepareStartup(f), /运行环境校验失败/);
 });
+
+test('Windows launch path casing reuses verified files', { skip: process.platform !== 'win32' }, async () => {
+  const f = fixture();
+  const mixed = f.bundle + '-MiXeD';
+  fs.renameSync(f.bundle, mixed);
+  f.bundle = mixed;
+  f.selectedVault = path.join(mixed, 'knowledge');
+  await prepareStartup(f);
+  const warm = await prepareStartup({ ...f, bundle: mixed.toLowerCase() });
+  assert.equal(warm.verification.hashed, 0);
+  assert.equal(warm.verification.reused, 3);
+});
 test('changed local program is repaired while personal data stays intact', async () => {
   const f = fixture(); await prepareStartup(f);
   const target = path.join(f.userData, 'platform/web/app.py');

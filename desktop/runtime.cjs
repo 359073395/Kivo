@@ -91,6 +91,10 @@ function matches(file, expected, context) {
   return context ? context.matches(file, expected) : fs.existsSync(file) && sha(fs.readFileSync(file)) === expected;
 }
 
+function isUserDataPath(relative) {
+  return /^(?:outputs|profiles|logs|collectors)(?:\/|$)|(?:^|\/)\.env(?:$|\.(?!example$))|(?:^|\/)cookies\.json$|^lingxi-config\.local\.json$|^config\/(?:trend-(?:sources|scripts)\.json(?:\.lock)?$|trend-collectors(?:\/|$))|^skills\/builtin\/skill-wechat-publisher\/wechat-publisher\.yaml$/i.test(relative);
+}
+
 function syncPlatform(bundle, userData, context) {
   const manifest = JSON.parse(fs.readFileSync(path.join(bundle, 'platform-manifest.json'), 'utf8'));
   const root = path.join(userData, 'platform');
@@ -98,7 +102,7 @@ function syncPlatform(bundle, userData, context) {
   let count = 0;
   for (const [index, file] of manifest.files.entries()) {
     if (index % 25 === 0) context?.progress({ stage: '程序文件', done: index, total: manifest.files.length });
-    if (/^(?:outputs|profiles|logs)(?:\/|$)|^\.env(?:$|\.(?!example$))|^cookies\.json$/.test(file.path)) throw new Error('程序包不能覆盖用户数据');
+    if (isUserDataPath(file.path)) throw new Error('程序包不能覆盖用户数据');
     const source = inside(path.join(bundle, 'platform'), file.path, context?.directories);
     const target = inside(root, file.path, context?.directories);
     if (!matches(source, file.sha256, context)) throw new Error('安装文件校验失败：' + file.path);
@@ -189,4 +193,4 @@ function freePort() {
     server.listen(0, '127.0.0.1', () => { const { port } = server.address(); server.close(() => resolve(port)); });
   });
 }
-module.exports = { inside, sha, replaceFile, syncPlatform, syncRuntime, syncKnowledge, updateUrl, freePort, verificationContext };
+module.exports = { inside, sha, replaceFile, syncPlatform, syncRuntime, syncKnowledge, updateUrl, freePort, verificationContext, isUserDataPath };

@@ -5,6 +5,7 @@ import json
 import re
 import sys
 import urllib.request
+from urllib.parse import quote
 from pathlib import Path
 
 if __package__ in (None, ""):
@@ -55,6 +56,9 @@ def parse_upstream(obj: object) -> list[dict]:
         match = re.fullmatch(r"https?://api\.zhihu\.com/questions/(\d+)", url)
         if match:
             url = f"https://www.zhihu.com/question/{match.group(1)}"
+        # Search providers can return unescaped spaces inside query values.
+        base, separator, query = url.partition("?")
+        url = base + separator + quote(query, safe="=&?/:@!$'()*+,;[]%#")
         out.append({"title": title, "url": url, "heat": {"text": hot}})
     return out
 

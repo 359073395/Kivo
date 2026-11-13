@@ -31,3 +31,10 @@ if _root:
         _path = str(Path(_root) / _relative)
         if Path(_path).is_dir() and _path not in sys.path:
             sys.path.insert(0, _path)
+
+# The embedded interpreter's ._pth mode omits the script directory. Restore
+# standard Python script imports for sibling helpers such as config.py.
+if sys.argv and sys.argv[0].lower().endswith('.py'):
+    _script_directory = str(Path(sys.argv[0]).resolve().parent)
+    if _script_directory not in sys.path:
+        sys.path.insert(0, _script_directory)

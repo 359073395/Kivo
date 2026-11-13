@@ -1,7 +1,7 @@
 // Build inputs are explicit. Never copy the workspace's secrets or user data.
 const fs = require('node:fs');
 const path = require('node:path');
-const { sha } = require('./runtime.cjs');
+const { sha, isUserDataPath } = require('./runtime.cjs');
 const root = path.resolve(__dirname, '..');
 const out = path.join(__dirname, 'bundle');
 const version = require('./package.json').version;
@@ -12,6 +12,7 @@ function walk(source, target, filter = () => true, excluded = forbidden) {
     if (entry.isSymbolicLink() || excluded.has(entry.name) || !filter(entry.name)) continue;
     if (/^\.env(\.|$)|^cookies\.json$|^__editable__|\.py[co]$|\.log$|\.bak$|\.tmp$/.test(entry.name)) continue;
     const from = path.join(source, entry.name), to = path.join(target, entry.name);
+    if (isUserDataPath(path.relative(root, from).split(path.sep).join('/'))) continue;
     if (entry.isDirectory()) walk(from, to, filter, excluded);
     else { fs.mkdirSync(path.dirname(to), { recursive: true }); fs.copyFileSync(from, to); }
   }
@@ -80,12 +81,12 @@ for (const file of portable.files) {
 fs.copyFileSync(path.join(vaultRoot, 'PORTABLE-MANIFEST.json'), path.join(vaultOut, 'PORTABLE-MANIFEST.json'));
 const knowledgeFiles = manifest(vaultOut, 'knowledge-manifest.json');
 const platformFiles = manifest(platform, 'platform-manifest.json',
-  (relative) => path.basename(relative) !== '.gitkeep');
+  (relative) => path.basename(relative) !== '.gitkeep' && !isUserDataPath(relative));
 // ARM pip launchers are not used by x64 Python; omit them from the integrity list,
 // including when an earlier staging directory still contains copies.
 const runtimeFiles = manifest(python, 'runtime-manifest.json',
   (relative) => !/^(?:Lib\/site-packages\/(?:easel-0\.3\.0|pip-26\.1\.1)\.dist-info\/|Lib\/site-packages\/pip\/_vendor\/distlib\/[tw]64-arm(?:64)?\.exe$)|(?:^|\/)__pycache__\/|\.py[co]$/.test(relative));
-if (platformFiles.some((file) => /(?:^|\/)\.env(?:$|\.(?!example$))|cookies\.json$|^(?:outputs|profiles)\//.test(file.path))) throw new Error('包内发现用户配置，停止打包');
+if (platformFiles.some((file) => isUserDataPath(file.path))) throw new Error('包内发现用户配置，停止打包');
 console.log(JSON.stringify({ version, platformFiles: platformFiles.length, runtimeFiles: runtimeFiles.length,
   skills: fs.readdirSync(path.join(platform, 'skills/builtin')).filter((p) => fs.existsSync(path.join(platform, 'skills/builtin', p, 'SKILL.md'))).length,
   privateKnowledgeBundled: true, knowledgeFiles: knowledgeFiles.length, credentialsBundled: false }));

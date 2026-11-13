@@ -30,10 +30,24 @@ test('program upgrade preserves local knowledge, content, credentials and old us
   assert.equal(syncPlatform(bundle, user).changedFiles, 0);
 });
 test('a package may not overwrite credential or user content paths', () => {
-  for (const file of ['.env', 'outputs/work.md', 'profiles/me/a.md', 'cookies.json']) {
+  for (const file of ['.env', 'outputs/work.md', 'profiles/me/a.md', 'cookies.json',
+    'config/trend-sources.json', 'config/trend-scripts.json',
+    'config/trend-collectors/private.py', 'skills/builtin/skill-wechat-publisher/wechat-publisher.yaml']) {
     const { bundle, user } = fixture('platform'); put(bundle, 'platform', '0.3.0', { [file]: 'bad' });
     assert.throws(() => syncPlatform(bundle, user), /用户数据/);
   }
+});
+
+test('upgrade keeps edited trend sources and uploaded collectors', () => {
+  const { bundle, user } = fixture('platform');
+  put(bundle, 'platform', '0.3.6', { 'web/app.py': 'new code' });
+  const config = path.join(user, 'platform/config');
+  fs.mkdirSync(path.join(config, 'trend-collectors'), { recursive: true });
+  fs.writeFileSync(path.join(config, 'trend-sources.json'), 'my sources');
+  fs.writeFileSync(path.join(config, 'trend-collectors/private.py'), 'my collector');
+  syncPlatform(bundle, user);
+  assert.equal(fs.readFileSync(path.join(config, 'trend-sources.json'), 'utf8'), 'my sources');
+  assert.equal(fs.readFileSync(path.join(config, 'trend-collectors/private.py'), 'utf8'), 'my collector');
 });
 test('path traversal and credential-bearing update sources are rejected', async () => {
   for (const target of ['../bad', '/etc/test', 'a/../bad', 'C:/bad', 'a\\bad']) assert.throws(() => inside(os.tmpdir(), target));

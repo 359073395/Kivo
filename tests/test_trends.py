@@ -23,6 +23,8 @@ from easel.trends.sources import load_sources
      "118万", "https://example.com/1"),
     ({"data": {"list": [{"word": "标题", "num": 42}]}}, "42", ""),
     ({"data": {"data": [{"name": "标题"}]}}, "", ""),
+    ({"data": [{"title": "标题", "url": "https://s.weibo.com/weibo?q=热门 话题"}]},
+     "", "https://s.weibo.com/weibo?q=%E7%83%AD%E9%97%A8%20%E8%AF%9D%E9%A2%98"),
 ])
 def test_builtin_normalizes_upstream_shapes(response, hot, url):
     assert builtin.parse_upstream(response) == [{"title": "标题", "url": url, "heat": {"text": hot}}]
