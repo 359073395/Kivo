@@ -98,3 +98,15 @@ test('no worker error overwrites the last successful cache', async () => {
   await assert.rejects(prepareStartup(f), /安装文件校验失败/);
   assert.equal(fs.readFileSync(cache, 'utf8'), before);
 });
+
+test('redirected user data is synchronized through its physical path', async () => {
+  const f = fixture();
+  const physical = f.userData + '-physical';
+  fs.renameSync(f.userData, physical);
+  fs.symlinkSync(physical, f.userData, 'junction');
+  f.selectedVault = path.join(f.userData, 'knowledge-vault');
+  const result = await prepareStartup(f);
+  assert.equal(result.installed.root, path.join(fs.realpathSync.native(physical), 'platform'));
+  assert.ok(fs.existsSync(path.join(physical, 'knowledge-vault/knowledge-base.json')));
+  assert.equal((await prepareStartup(f)).installed.changedFiles, 0);
+});
