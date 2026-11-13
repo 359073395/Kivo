@@ -35,7 +35,7 @@ test('worker keeps event loop live and warm launch hashes no unchanged program/r
     assert.equal(warm.verification.hashed, 0);
     assert.equal(warm.verification.reused, 3);
     assert.equal(warm.installed.changedFiles, 0);
-    assert.equal(warm.python, path.join(f.bundle, 'python/python.exe'));
+    assert.equal(warm.python, fs.realpathSync.native(path.join(f.bundle, 'python/python.exe')));
   } finally { clearInterval(timer); }
 });
 test('cache cannot hide changed runtime bytes, even if mtime is restored', async () => {
