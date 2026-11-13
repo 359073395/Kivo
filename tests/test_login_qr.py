@@ -1,5 +1,6 @@
 """二维码裁剪、编码、平台拦截及 Web 登录进程的离线回归。"""
 import ast
+import base64
 import asyncio
 import io
 import json
@@ -101,6 +102,23 @@ def test_non_qr_image_does_not_create_output(tmp_path):
     output = tmp_path / "qr.png"
     assert not login_qr.save_qr(image.getvalue(), output)
     assert not output.exists()
+
+
+def test_qr_reads_image_pixels_without_screenshot(tmp_path):
+    element = qr_element()
+    element.evaluate = lambda script: "data:image/png;base64," + base64.b64encode(qr_bytes()).decode()
+    element.screenshot = Mock(side_effect=AssertionError("visible window must not repaint"))
+    page = SimpleNamespace(query_selector_all=lambda selector: [element], wait_for_timeout=Mock())
+    login_qr.capture_qr(page, tmp_path / "qr.png", ".qrcode-img")
+    element.screenshot.assert_not_called()
+    assert (tmp_path / "qr.png").is_file()
+
+
+def test_creator_only_capture_keeps_current_page(tmp_path, monkeypatch):
+    page = xhs_page(xhs_publish.CREATOR_LOGIN_URL)
+    monkeypatch.setattr(login_qr, "capture_qr", Mock())
+    assert xhs_publish._capture_login_qr(page, tmp_path / "qr.png", creator_only=True)
+    page.goto.assert_not_called()
 
 
 def test_xhs_minimum_qr_size_rejects_small_switch_icon(tmp_path):
@@ -662,7 +680,8 @@ def test_xhs_runner_persists_terminal_status_and_closes_browser(tmp_path, monkey
     if expected == "error":
         assert "300013" in status["message"]
     context.close.assert_called_once()
-    capture.assert_called_once_with(page, Path(args.qr_out), creator_only=explore_timeout)
+    capture.assert_called_once_with(page, Path(args.qr_out), creator_only=True)
+    assert page.goto.call_args_list[0].args == (xhs_publish.CREATOR_LOGIN_URL,)
 
 
 @pytest.mark.parametrize(("maintenance", "verified", "expected"), [
@@ -718,8 +737,9 @@ def test_xhs_scanned_login_checks_account_before_page_failure(
 
 @pytest.mark.parametrize("platform", ["xiaohongshu", "zhihu"])
 @pytest.mark.parametrize("refresh_missing", [False, True])
+@pytest.mark.parametrize("headed", [False, True])
 def test_login_runner_refreshes_qr_and_handles_success(tmp_path, monkeypatch, platform,
-                                                      refresh_missing):
+                                                      refresh_missing, headed):
     from playwright import sync_api
 
     page = xhs_page()
@@ -741,7 +761,7 @@ def test_login_runner_refreshes_qr_and_handles_success(tmp_path, monkeypatch, pl
     monkeypatch.setattr(login_qr, "capture_qr", refresh)
     args = SimpleNamespace(platform=platform, qr_out=str(tmp_path / "qr.png"), timeout=30,
                            status_file=str(tmp_path / "status.json"),
-                           profile_base=str(tmp_path / "profiles"), headed=False,
+                           profile_base=str(tmp_path / "profiles"), headed=headed,
                            proxy=None, no_proxy=True)
     if platform == "xiaohongshu":
         monkeypatch.setattr(xhs_publish, "_launch", lambda *args, **kwargs: context)
@@ -757,7 +777,10 @@ def test_login_runner_refreshes_qr_and_handles_success(tmp_path, monkeypatch, pl
         assert web_publisher.cmd_login_qr(args) == 0
         selectors = web_publisher.PLATFORMS["zhihu"]["login_qr_selector"]
     expected = {"attempts": 1, **({"minimum_size": 96} if platform == "xiaohongshu" else {})}
-    refresh.assert_called_once_with(page, Path(args.qr_out), selectors, **expected)
+    if platform == "xiaohongshu" and headed:
+        refresh.assert_not_called()
+    else:
+        refresh.assert_called_once_with(page, Path(args.qr_out), selectors, **expected)
     assert login_state.read_status(args.status_file)["state"] == "success"
     context.close.assert_called_once()
 

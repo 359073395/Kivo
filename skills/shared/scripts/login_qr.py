@@ -1,6 +1,7 @@
 """小红书、知乎共用的二维码截图：验证图案，只保存二维码，不兜底整页。"""
 from __future__ import annotations
 
+import base64
 import io
 import math
 import os
@@ -90,7 +91,23 @@ def capture_qr(page, output: Path, selectors: str, *, attempts: int = 3,
                         continue
                     if max(bounds["width"], bounds["height"]) > 1200:
                         continue
-                    image_bytes = element.screenshot(timeout=3000, animations="disabled")
+                    # Reading existing image pixels avoids screenshot-induced scrolling
+                    # and repainting of the visible login window.
+                    try:
+                        encoded = element.evaluate("""element => {
+                            if (element instanceof HTMLCanvasElement) return element.toDataURL('image/png');
+                            if (!(element instanceof HTMLImageElement) || !element.complete || !element.naturalWidth) return '';
+                            const canvas = document.createElement('canvas');
+                            canvas.width = element.naturalWidth;
+                            canvas.height = element.naturalHeight;
+                            canvas.getContext('2d').drawImage(element, 0, 0);
+                            return canvas.toDataURL('image/png');
+                        }""")
+                        image_bytes = base64.b64decode(encoded.split(',', 1)[1], validate=True) if encoded else None
+                    except Exception:
+                        image_bytes = None
+                    if image_bytes is None:
+                        image_bytes = element.screenshot(timeout=3000, animations="disabled")
                     if image_bytes in seen:
                         continue
                     seen.add(image_bytes)

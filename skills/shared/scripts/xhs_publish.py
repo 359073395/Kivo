@@ -326,8 +326,10 @@ def _missing_qr_reason(page) -> str:
 def _capture_login_qr(page, qr_out: Path, *, creator_only: bool = False) -> bool:
     """首页无法出码时只尝试一次官方创作平台入口；False 表示已登录。"""
     failures = []
-    for url in ((CREATOR_LOGIN_URL,) if creator_only else (None, CREATOR_LOGIN_URL)):
-        entry = "创作平台" if url else "小红书首页"
+    creator = urlparse(page.url or "").hostname == "creator.xiaohongshu.com"
+    destinations = (None if creator else CREATOR_LOGIN_URL,) if creator_only else (None, CREATOR_LOGIN_URL)
+    for url in destinations:
+        entry = "创作平台" if creator or url else "小红书首页"
         try:
             if url:
                 page.goto(url, wait_until="commit", timeout=30000)
@@ -1125,16 +1127,16 @@ def cmd_login(a) -> int:
                     login_state.write_status(
                         sf, "window_login",
                         "请在弹出的浏览器窗口里扫码，不要关掉那个窗口。")
-                explore_failed = False
+                entry_failed = False
                 try:
-                    page.goto(EXPLORE_URL, wait_until="commit", timeout=30000)
+                    page.goto(CREATOR_LOGIN_URL, wait_until="commit", timeout=30000)
                 except Exception as error:
-                    explore_failed = True
-                    print(f"小红书首页无法打开（{type(error).__name__}），尝试官方创作平台入口",
+                    entry_failed = True
+                    print(f"小红书创作平台加载超时（{type(error).__name__}），等待登录页面就绪",
                           file=sys.stderr)
 
                 # 等待页面稳定并完成可能的跳转（登录引导 / 风险拦截 / 已登录态）
-                for _ in range(0 if explore_failed else 10):
+                for _ in range(0 if entry_failed else 10):
                     page.wait_for_timeout(800)
                     if _login_error(page):
                         break
@@ -1152,7 +1154,7 @@ def cmd_login(a) -> int:
                 # 抠二维码存 PNG（元素截图，不依赖 src 格式，最稳）
                 qr = False
                 try:
-                    qr = _capture_login_qr(page, qr_out, creator_only=explore_failed)
+                    qr = _capture_login_qr(page, qr_out, creator_only=True)
                     if not qr:
                         login_state.write_status(sf, "success", "已登录")
                         print("✅ 已登录（创作平台登录态已在持久化目录），无需扫码")
@@ -1216,7 +1218,7 @@ def cmd_login(a) -> int:
                             return 1
                         refreshes += 1
                         login_state.write_status(sf, "qr_ready", "二维码已刷新，请重新扫码", qr=str(qr_out))
-                    if qr and time.monotonic() >= next_refresh:
+                    if qr and not a.headed and time.monotonic() >= next_refresh:
                         if not scanned:
                             try:
                                 login_qr.capture_qr(page, qr_out, SELECTORS["qrcode"], attempts=1,
