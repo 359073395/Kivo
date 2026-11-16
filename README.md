@@ -2,9 +2,9 @@
 
 <img src="desktop/icon.png" width="88" alt="Kivo">
 
-基于 Easel 的增量版本，保留原平台工作流与114个内置技能，新增可追溯知识库、数据反馈自学习、创作校验和通用API独立工具引擎。Kivo 是品牌名，可赋义为 Knowledge In, Value Out（知识输入，价值输出），不是现成英文单词的释义。
+基于 Easel 的增量版本，保留原平台工作流与118个内置技能，新增可追溯知识库、数据反馈自学习、创作校验和通用API独立工具引擎。Kivo 是品牌名，可赋义为 Knowledge In, Value Out（知识输入，价值输出），不是现成英文单词的释义。
 
-- [下载 Windows 0.3.1 桌面安装版](https://github.com/359073395/Kivo/releases/latest)
+- [下载 Windows 桌面安装版](https://github.com/359073395/Kivo/releases/latest)
 - [Kivo使用、升级与本地存储说明](README-Kivo.md)
 - [知识副本与发布边界](PUBLICATION-NOTICE.md)
 

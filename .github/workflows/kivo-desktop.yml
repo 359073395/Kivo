@@ -23,6 +23,7 @@ jobs:
           npm run build --prefix web/frontend
           npm ci --prefix desktop
           ./desktop/Prepare-Python.ps1
+          ./desktop/Prepare-Media.ps1
           node desktop/prepare.cjs
           npm test --prefix desktop
           npm run build --prefix desktop
