@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { memo, useCallback, useState, useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
 import QuestionCards from './QuestionCards';
 import BrushEntry from './BrushEntry';
@@ -38,6 +38,33 @@ function greeting(): string {
   return `${g}，想创作点什么？`;
 }
 
+// Completed messages, artifacts and question cards stay unchanged while a new reply streams.
+const ChatHistory = memo(function ChatHistory({ messages, isStreaming, onResend, onQuestionAnswered, onQuestionClosed }: {
+  messages: ChatMessage[];
+  isStreaming: boolean;
+  onResend: ChatPageProps['onResend'];
+  onQuestionAnswered: ChatPageProps['onQuestionAnswered'];
+  onQuestionClosed: ChatPageProps['onQuestionClosed'];
+}) {
+  return messages.map((msg, i) => {
+    const copy = () => navigator.clipboard?.writeText(msg.content);
+    const isLast = i === messages.length - 1;
+    const previousUser = i > 0 && messages[i - 1]?.role === 'user' ? messages[i - 1] : null;
+    const retryUser = msg.role === 'user' ? msg : previousUser;
+    const actions = {
+      onCopy: copy,
+      onRetry: isLast && retryUser ? () => onResend(
+        msg.role === 'user' ? i : i - 1, retryUser.content, retryUser.attachments, retryUser.agentContent,
+      ) : undefined,
+      canModify: !isStreaming,
+    };
+    return <div key={`${i}-${msg.role}`}>
+      <MessageBubble message={msg} actions={actions} />
+      {msg.questions && <QuestionCards questions={msg.questions} onDone={onQuestionAnswered} onClosed={onQuestionClosed} />}
+    </div>;
+  });
+});
+
 export default function ChatPage({ apiDirect, session, stream, onSend, onStop, onResend, onQuestionAnswered, onQuestionClosed }: ChatPageProps) {
   const [input, setInput] = useState('');
   const [attachments, setAttachments] = useState<UploadedFile[]>([]);
@@ -45,12 +72,21 @@ export default function ChatPage({ apiDirect, session, stream, onSend, onStop, o
   const [dragOver, setDragOver] = useState(false);
   const [maxMb, setMaxMb] = useState(50);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageScrollerRef = useRef<HTMLDivElement>(null);
+  const followOutputRef = useRef(true);
+  const callbacksRef = useRef({ onResend, onQuestionAnswered, onQuestionClosed });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isComposingRef = useRef(false);
 
   const isStreaming = !!stream;
   const isEmpty = session.messages.length === 0 && !isStreaming;
+
+  useEffect(() => { followOutputRef.current = true; }, [session.id]);
+  useEffect(() => { callbacksRef.current = { onResend, onQuestionAnswered, onQuestionClosed }; }, [onResend, onQuestionAnswered, onQuestionClosed]);
+  const resend = useCallback<ChatPageProps['onResend']>((...args) => callbacksRef.current.onResend(...args), []);
+  const questionAnswered = useCallback((id: string) => callbacksRef.current.onQuestionAnswered?.(id), []);
+  const questionClosed = useCallback((id: string, status: string) => callbacksRef.current.onQuestionClosed?.(id, status), []);
 
   useEffect(() => {
     fetch('/api/upload/limits').then((r) => r.json())
@@ -97,7 +133,10 @@ export default function ChatPage({ apiDirect, session, stream, onSend, onStop, o
   const removeAttachment = (path: string) => setAttachments((a) => a.filter((x) => x.path !== path));
 
   useEffect(() => {
-    if (!isEmpty) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (isEmpty || !followOutputRef.current) return;
+    // Streaming updates should not restart an animated scroll dozens of times a second.
+    const frame = requestAnimationFrame(() => messagesEndRef.current?.scrollIntoView({ behavior: 'instant', block: 'end' }));
+    return () => cancelAnimationFrame(frame);
   }, [session.messages, stream?.content, stream?.thinking, stream?.activity, stream?.stillWorking, isEmpty]);
 
   useEffect(() => {
@@ -111,6 +150,7 @@ export default function ChatPage({ apiDirect, session, stream, onSend, onStop, o
   const handleSend = () => {
     const trimmed = input.trim();
     if ((!trimmed && attachments.length === 0) || isStreaming || uploading) return;
+    followOutputRef.current = true;
     // 附件通过结构化字段发送；用户消息气泡只显示用户实际输入的文字。
     onSend(trimmed, attachments);
     setInput('');
@@ -208,57 +248,17 @@ export default function ChatPage({ apiDirect, session, stream, onSend, onStop, o
   }
 
   // ---- 对话态 ----
-  const displayMessages: ChatMessage[] = [...session.messages];
-  if (isStreaming) displayMessages.push({ role: 'assistant', content: stream!.content || '' });
-
   return (
     <div className="chat-page">
-      <div className="chat-messages">
+      <div className="chat-messages" ref={messageScrollerRef} onScroll={() => {
+        const scroller = messageScrollerRef.current;
+        if (scroller) followOutputRef.current = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 96;
+      }}>
         <div className="chat-thread">
-          {displayMessages.map((msg, i) => {
-            const isLast = i === displayMessages.length - 1;
-            const live = isStreaming && isLast && msg.role === 'assistant';
-            const isFinal = !live && i < session.messages.length;
-            let actions;
-            if (isFinal) {
-              const copy = () => navigator.clipboard?.writeText(msg.content);
-              // 只允许对「最后一轮」重试，契合 OpenClaw append-only 模型（不改写历史）；已移除编辑
-              const isLastFinal = i === session.messages.length - 1;
-              if (msg.role === 'user') {
-                actions = {
-                  onCopy: copy,
-                  onRetry: isLastFinal
-                    ? () => onResend(i, msg.content, msg.attachments, msg.agentContent)
-                    : undefined,
-                  canModify: !isStreaming,
-                };
-              } else {
-                const pi = i - 1;
-                const prevUser = pi >= 0 && session.messages[pi]?.role === 'user' ? session.messages[pi] : null;
-                actions = {
-                  onCopy: copy,
-                  onRetry: (isLastFinal && prevUser)
-                    ? () => onResend(pi, prevUser.content, prevUser.attachments, prevUser.agentContent)
-                    : undefined,
-                  canModify: !isStreaming,
-                };
-              }
-            }
-            return (
-              <div key={`${i}-${msg.role}`}>
-              <MessageBubble
-                key={`${i}-${msg.role}`}
-                message={msg}
-                isStreaming={live}
-                thinking={live ? stream!.thinking : ''}
-                activity={live ? stream!.activity : ''}
-                stillWorking={live ? stream!.stillWorking : ''}
-                actions={actions}
-              />
-              {!live && msg.questions && <QuestionCards questions={msg.questions} onDone={onQuestionAnswered} onClosed={onQuestionClosed} />}
-              </div>
-            );
-          })}
+          <ChatHistory messages={session.messages} isStreaming={isStreaming} onResend={resend}
+            onQuestionAnswered={questionAnswered} onQuestionClosed={questionClosed} />
+          {isStreaming && <MessageBubble message={{ role: 'assistant', content: stream!.content || '' }}
+            isStreaming thinking={stream!.thinking} activity={stream!.activity} stillWorking={stream!.stillWorking} />}
           {isStreaming && (stream!.questions?.length ?? 0) > 0 && (
             <QuestionCards questions={stream!.questions || []} onDone={(qid) => onQuestionAnswered?.(qid)} onClosed={onQuestionClosed} />
           )}

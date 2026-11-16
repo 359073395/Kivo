@@ -100,6 +100,17 @@ body {
 
 .sidebar-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
 
+/* Shell and shared controls must be styled before any lazy page has loaded. */
+.lingxi-logo { display: grid; place-items: center; flex-shrink: 0; width: 31px; height: 31px; border-radius: 10px; background: var(--accent-gradient); color: #fff; font-family: serif; font-size: 21px; }
+.kivo-logo { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+.settings-feedback { padding: 0 18px; flex-shrink: 0; max-height: 200px; overflow: auto; }
+.settings-feedback .save-note { margin: 6px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.board .cell-result { white-space: normal; overflow-wrap: anywhere; }
+.lx-feedback-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 12px; }
+.lx-feedback-metrics input { width: 100%; min-width: 0; }
+.lx-feedback-row { display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border); padding: 14px; border-radius: 8px; overflow-wrap: anywhere; }
+.lx-feedback-row small, .lx-feedback-row span { color: var(--text-secondary); font-size: 12px; }
+
 .sidebar-logo h1 {
   color: var(--text);
   font-family: 'Bodoni Moda', 'Didot', 'Baskerville', serif;

@@ -27,24 +27,31 @@ function replaceFile(temp, target) {
     fs.unlinkSync(temp);
   }
 }
-function inside(root, relative, checkedDirectories) {
+function inside(root, relative, checkedDirectories, deferLeafCheck = false) {
   if (typeof relative !== 'string' || !relative || relative.includes('\\') || path.isAbsolute(relative)) throw new Error('安装清单路径无效');
   const target = path.resolve(root, relative);
   if (!target.startsWith(path.resolve(root) + path.sep)) throw new Error('安装清单越界');
   const parts = relative.split('/');
   if (parts.some((part) => ['..', '.', ''].includes(part)) || relative.includes(':')) throw new Error('安装清单路径无效');
+  // Sibling files share an already checked ancestor chain. The leaf is still
+  // checked by matches(); do not rebuild every path component for each sibling.
+  if (deferLeafCheck && checkedDirectories?.has(path.dirname(target))) return target;
   let cursor = root;
   for (const [index, part] of parts.entries()) {
     cursor = path.join(cursor, part);
     if (index < parts.length - 1 && checkedDirectories?.has(cursor)) continue;
-    if (fs.existsSync(cursor) && fs.lstatSync(cursor).isSymbolicLink()) throw new Error('安装目标含外部链接，已停止');
-    if (index < parts.length - 1 && fs.existsSync(cursor)) checkedDirectories?.add(cursor);
+    // matches() performs a fresh lstat of the leaf immediately afterwards. Keep
+    // ancestor checks here, but avoid repeating leaf metadata queries per file.
+    if (index === parts.length - 1 && deferLeafCheck) continue;
+    const stat = fs.lstatSync(cursor, { throwIfNoEntry: false });
+    if (stat?.isSymbolicLink()) throw new Error('安装目标含外部链接，已停止');
+    if (index < parts.length - 1 && stat) checkedDirectories?.add(cursor);
   }
   return target;
 }
 
 // This is an acceleration cache, not a security boundary against a local attacker.
-// Changed metadata/manifests, expired or invalid caches always require SHA-256 again.
+// Changed metadata/expected hashes, expired or invalid caches require SHA-256 again.
 function verificationContext(bundle, userData, progress = () => {}, force = false) {
   const cacheFile = path.join(userData, 'startup-verification.json');
   const identity = sha(Buffer.concat(['platform', 'runtime', 'knowledge'].map(kind =>
@@ -52,7 +59,10 @@ function verificationContext(bundle, userData, progress = () => {}, force = fals
   let previous = {};
   try { previous = JSON.parse(fs.readFileSync(cacheFile, 'utf8')); } catch {}
   const now = Date.now();
-  const reusable = !force && previous.schema === 1 && previous.identity === identity &&
+  // Each entry already binds a verified SHA-256 to the file's full metadata.
+  // A manifest/version update should rehash changed files, rather than all
+  // unchanged runtime dependencies. Keep the original full-check deadline.
+  const reusable = !force && previous.schema === 1 && /^[a-f0-9]{64}$/.test(previous.identity) &&
     previous.bundle === path.resolve(bundle) && Number.isFinite(previous.fullCheckAt) &&
     now >= previous.fullCheckAt && now - previous.fullCheckAt < 7 * 86400000;
   const entries = reusable ? (previous.entries || {}) : {};
@@ -60,15 +70,16 @@ function verificationContext(bundle, userData, progress = () => {}, force = fals
   const stats = { hashed: 0, reused: 0 };
   const directories = new Set();
   function fingerprint(file) {
-    const s = fs.lstatSync(file);
+    const s = fs.lstatSync(file, { throwIfNoEntry: false });
+    if (!s) return null;
     if (!s.isFile() || s.isSymbolicLink()) throw new Error('校验目标不是普通文件');
     return [s.size, s.mtimeMs, s.ctimeMs, String(s.ino), String(s.dev)].join(':');
   }
   return {
     directories, progress, stats,
     matches(file, expected) {
-      if (!fs.existsSync(file)) return false;
       const stamp = fingerprint(file);
+      if (stamp === null) return false;
       const cached = entries[file];
       if (cached?.stamp === stamp && cached.hash === expected) {
         next[file] = cached; stats.reused++; return true;
@@ -103,8 +114,8 @@ function syncPlatform(bundle, userData, context) {
   for (const [index, file] of manifest.files.entries()) {
     if (index % 25 === 0) context?.progress({ stage: '程序文件', done: index, total: manifest.files.length });
     if (isUserDataPath(file.path)) throw new Error('程序包不能覆盖用户数据');
-    const source = inside(path.join(bundle, 'platform'), file.path, context?.directories);
-    const target = inside(root, file.path, context?.directories);
+    const source = inside(path.join(bundle, 'platform'), file.path, context?.directories, Boolean(context));
+    const target = inside(root, file.path, context?.directories, Boolean(context));
     if (!matches(source, file.sha256, context)) throw new Error('安装文件校验失败：' + file.path);
     if (matches(target, file.sha256, context)) continue;
     const body = fs.readFileSync(source);
@@ -148,7 +159,7 @@ function syncRuntime(bundle, context) {
   const root = path.join(bundle, 'python');
   for (const [index, file] of manifest.files.entries()) {
     if (index % 25 === 0) context?.progress({ stage: '运行环境', done: index, total: manifest.files.length });
-    if (!matches(inside(root, file.path, context?.directories), file.sha256, context)) throw new Error('运行环境校验失败：' + file.path);
+    if (!matches(inside(root, file.path, context?.directories, Boolean(context)), file.sha256, context)) throw new Error('运行环境校验失败：' + file.path);
   }
   return path.join(root, 'python.exe');
 }
@@ -164,12 +175,14 @@ function syncKnowledge(bundle, userData, context) {
   let added = 0, updated = 0, conflicts = 0;
   for (const [index, file] of manifest.files.entries()) {
     if (index % 25 === 0) context?.progress({ stage: '本地知识', done: index, total: manifest.files.length });
-    const source = inside(path.join(bundle, 'knowledge'), file.path), target = inside(root, file.path);
+    const source = inside(path.join(bundle, 'knowledge'), file.path, context?.directories, Boolean(context));
+    const target = inside(root, file.path, context?.directories, Boolean(context));
+    if (!matches(source, file.sha256, context)) throw new Error('内置知识校验失败：' + file.path);
+    if (matches(target, file.sha256, context)) { baseline[file.path] = file.sha256; continue; }
     const body = fs.readFileSync(source);
-    if (sha(body) !== file.sha256) throw new Error('内置知识校验失败：' + file.path);
+    if (sha(body) !== file.sha256) throw new Error('内置知识在复制前发生变化：' + file.path);
     if (fs.existsSync(target)) {
       const currentHash = sha(fs.readFileSync(target));
-      if (currentHash === file.sha256) { baseline[file.path] = file.sha256; continue; }
       if (currentHash !== previous.hashes?.[file.path]) {
         const incoming = inside(path.join(userData, 'knowledge-incoming', manifest.version), file.path);
         fs.mkdirSync(path.dirname(incoming), { recursive: true }); fs.writeFileSync(incoming, body);
@@ -180,6 +193,7 @@ function syncKnowledge(bundle, userData, context) {
     fs.mkdirSync(path.dirname(target), { recursive: true });
     const temp = target + '.' + crypto.randomUUID() + '.tmp';
     fs.writeFileSync(temp, body); replaceFile(temp, target);
+    if (!matches(target, file.sha256, context)) throw new Error('知识复制校验失败：' + file.path);
     baseline[file.path] = file.sha256;
   }
   fs.writeFileSync(stateFile, JSON.stringify({ version: manifest.version, hashes: baseline, conflicts }, null, 2));

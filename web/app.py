@@ -28,6 +28,7 @@ import uuid
 import zipfile
 from contextlib import asynccontextmanager
 from dataclasses import asdict
+from functools import lru_cache
 import ipaddress
 from pathlib import Path
 
@@ -773,6 +774,13 @@ def _parse_skill_md(path: Path) -> tuple[str, str, str]:
     return desc, layer, body
 
 
+@lru_cache(maxsize=512)
+def _skill_summary(path: Path, stamp: tuple) -> tuple[str, str]:
+    # Cache only static documentation; API readiness is read on every request.
+    description, layer, _ = _parse_skill_md(path)
+    return description, layer
+
+
 def get_skills() -> list[dict]:
     env = _read_env()
     result = []
@@ -780,7 +788,9 @@ def get_skills() -> list[dict]:
     if sd.is_dir():
         for d in sorted(sd.iterdir()):
             if d.is_dir() and (d / 'SKILL.md').is_file():
-                desc, layer, _ = _parse_skill_md(d / 'SKILL.md')
+                path = d / 'SKILL.md'
+                stat = path.stat()
+                desc, layer = _skill_summary(path, (stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size))
                 needs_api = d.name in SKILL_API_REQUIREMENTS
                 result.append({
                     'name': d.name,
@@ -1394,9 +1404,11 @@ async def api_status():
         ready = await asyncio.to_thread(check_gateway)
     else:
         ready = (await asyncio.to_thread(harnesses.describe, runtime))["installed"]
+    skills, personas = await asyncio.gather(
+        asyncio.to_thread(get_skills), asyncio.to_thread(list_personas))
     return {"gateway": ready, "transport": "api" if direct else (
                 CHAT_TRANSPORT if runtime == "openclaw" else runtime), "runtime": runtime,
-            "skills": get_skills(), "personas": list_personas()}
+            "skills": skills, "personas": personas}
 
 
 @app.get("/api/settings/bootstrap")
@@ -1493,7 +1505,7 @@ async def api_gateway_restart():
 
 @app.get("/api/personas")
 async def api_personas():
-    return list_personas()
+    return await asyncio.to_thread(list_personas)
 
 
 @app.get("/api/persona/{name}")
@@ -1567,7 +1579,7 @@ async def api_persona_delete(name: str):
 
 @app.get("/api/skills")
 async def api_skills():
-    return get_skills()
+    return await asyncio.to_thread(get_skills)
 
 
 @app.get("/api/skill/{name}")

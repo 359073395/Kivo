@@ -59,7 +59,7 @@ test('manual account verification updates the card and identity from the same re
     setWhoami: callback => { identity = callback(identity); },
     setAccounts: callback => { accounts = callback(accounts); },
     setWhoamiCache: () => {},
-    accountWhoami: async (platform, force) => {
+    verifyWhoami: async (platform, force) => {
       assert.equal(platform, 'wechat-oa');
       assert.equal(force, true);
       return { loggedIn: false, name: '', avatar: '' };
@@ -89,12 +89,89 @@ test('failed account verification preserves the last verified nickname and avata
     getWhoamiCache: () => ({ 'weixin-channels': cached }),
     setAccounts: () => assert.fail('unknown identity cannot update login state'),
     setWhoamiCache: () => assert.fail('unknown identity cannot be cached'),
-    accountWhoami: async () => { throw new Error('identity endpoint not ready'); },
+    verifyWhoami: async () => { throw new Error('identity endpoint not ready'); },
   });
   verify('weixin-channels');
   assert.equal(identity['weixin-channels'], 'loading');
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(identity['weixin-channels'], cached);
+});
+
+function setupAccountLoad() {
+  const declaration = component.body.statements.find(node =>
+    ts.isVariableStatement(node) && node.declarationList.declarations.some(variable =>
+      variable.name.getText(parsed) === 'load'));
+  const { outputText: compiled } = ts.transpileModule(
+    declaration.getText(parsed) + '\nload;',
+    { compilerOptions: { target: ts.ScriptTarget.ES2022 } },
+  );
+  const pending = [];
+  const checks = [];
+  const state = { accounts: [], whoami: {}, error: '', cache: {} };
+  const refs = { accountsPending: { current: false }, accountsVerifyAll: { current: false },
+    accountsLoadedAt: { current: 0 }, aliveRef: { current: true } };
+  const load = runInNewContext(compiled, {
+    ...refs, Date,
+    useCallback: callback => callback,
+    fetchAccounts: () => new Promise((resolve, reject) => pending.push({ resolve, reject })),
+    getWhoamiCache: () => state.cache,
+    backgroundWhoamiPlatforms: (accounts, cache) => accounts
+      .filter(account => account.loggedIn || cache[account.platform]?.loggedIn).map(account => account.platform),
+    setWhoamiCache: (platform, result) => {
+      if (result === null) delete state.cache[platform];
+      else state.cache[platform] = result;
+    },
+    setWhoami: update => { state.whoami = update(state.whoami); },
+    setAccounts: update => { state.accounts = typeof update === 'function' ? update(state.accounts) : update; },
+    setErr: error => { state.error = error; },
+    verifyStale: (platforms, options) => checks.push({ platforms: Array.from(platforms), options }),
+  });
+  return { load, pending, checks, state, refs };
+}
+
+const accountList = [
+  { platform: 'xiaohongshu', loggedIn: true, supported: true, backend: 'xhs' },
+  { platform: 'zhihu', loggedIn: false, supported: true, backend: 'web' },
+  { platform: 'douyin', loggedIn: false, supported: true, backend: 'web' },
+  { platform: 'bilibili', loggedIn: true, supported: true, backend: 'biliup' },
+  { platform: 'unsupported', loggedIn: true, supported: false, backend: 'unsupported' },
+];
+
+test('automatic account refresh checks only platforms with login evidence', async () => {
+  const view = setupAccountLoad();
+  view.state.cache.zhihu = { loggedIn: true, name: 'Previously verified' };
+  view.load();
+  view.pending[0].resolve(accountList);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(view.checks[0].platforms, ['xiaohongshu', 'zhihu']);
+  assert.equal(view.checks[0].options.force, false);
+  assert.equal(view.state.accounts.length, accountList.length);
+  assert.equal(view.state.cache.zhihu, undefined, 'quick-state disagreement invalidates old identity before recheck');
+});
+
+test('focus bursts coalesce quick reads and preserve an explicit refresh requested in flight', async () => {
+  const view = setupAccountLoad();
+  view.load();
+  view.load();
+  view.load(true);
+  assert.equal(view.pending.length, 1);
+  view.pending[0].resolve(accountList);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(view.checks[0].platforms, ['xiaohongshu', 'zhihu', 'douyin']);
+  assert.equal(view.checks[0].options.force, true);
+  view.load();
+  assert.equal(view.pending.length, 2);
+});
+
+test('a detached account page does not enqueue browsers after its quick request finishes', async () => {
+  const view = setupAccountLoad();
+  view.load();
+  view.refs.aliveRef.current = false;
+  view.pending[0].resolve(accountList);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(view.checks.length, 0);
+  assert.equal(view.state.accounts.length, 0);
+  assert.equal(view.refs.accountsPending.current, false);
 });
 
 function setup() {

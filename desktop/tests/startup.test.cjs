@@ -86,15 +86,55 @@ test('explicit full verification bypasses cache and failure is reported by worke
   fs.unlinkSync(path.join(f.bundle, 'runtime-manifest.json'));
   await assert.rejects(prepareStartup(f), /ENOENT/);
 });
-test('manifest upgrade invalidates cached file hashes', async () => {
+test('manifest upgrade rechecks changed files while reusing unchanged runtime within the original deadline', async () => {
   const f = fixture(); await prepareStartup(f);
+  const cache = path.join(f.userData, 'startup-verification.json');
+  const previous = JSON.parse(fs.readFileSync(cache));
+  const fullCheckAt = Date.now() - 86400000;
+  previous.fullCheckAt = fullCheckAt;
+  fs.writeFileSync(cache, JSON.stringify(previous));
   const manifestFile = path.join(f.bundle, 'platform-manifest.json');
   const manifest = JSON.parse(fs.readFileSync(manifestFile));
   fs.writeFileSync(path.join(f.bundle, 'platform/web/app.py'), 'new code');
   manifest.files[0].sha256 = sha(Buffer.from('new code')); manifest.version = 'new';
   fs.writeFileSync(manifestFile, JSON.stringify(manifest));
   const result = await prepareStartup(f);
-  assert.equal(result.installed.changedFiles, 1); assert.equal(result.verification.reused, 0);
+  assert.equal(result.installed.changedFiles, 1);
+  assert.equal(result.verification.hashed, 3);
+  assert.equal(result.verification.reused, 1);
+  assert.equal(JSON.parse(fs.readFileSync(cache)).fullCheckAt, fullCheckAt);
+});
+
+test('manifest hash changes cannot reuse previously cached bytes with unchanged metadata', async () => {
+  const f = fixture(); await prepareStartup(f);
+  const manifestFile = path.join(f.bundle, 'runtime-manifest.json');
+  const manifest = JSON.parse(fs.readFileSync(manifestFile));
+  manifest.files[0].sha256 = sha(Buffer.from('different expected runtime'));
+  fs.writeFileSync(manifestFile, JSON.stringify(manifest));
+  await assert.rejects(prepareStartup(f), /运行环境校验失败/);
+});
+
+test('bundled knowledge uses verified cache and still preserves a changed local knowledge file', async () => {
+  const f = fixture();
+  f.selectedVault = path.join(f.userData, 'knowledge-vault');
+  await prepareStartup(f);
+  const warm = await prepareStartup(f);
+  assert.equal(warm.verification.hashed, 0);
+  assert.equal(warm.verification.reused, 5);
+  const local = path.join(f.userData, 'knowledge-vault/knowledge-base.json');
+  fs.writeFileSync(local, '{"personal":true}');
+  const changed = await prepareStartup(f);
+  assert.equal(changed.knowledge.conflicts, 1);
+  assert.equal(fs.readFileSync(local, 'utf8'), '{"personal":true}');
+  assert.equal(fs.readFileSync(path.join(f.userData, 'knowledge-incoming/test/knowledge-base.json'), 'utf8'), '{}');
+});
+
+test('a leaf changed from verified file to directory junction remains rejected', async () => {
+  const f = fixture(); await prepareStartup(f);
+  const leaf = path.join(f.bundle, 'platform/web/app.py');
+  const other = path.join(f.bundle, 'leaf-directory');
+  fs.mkdirSync(other); fs.unlinkSync(leaf); fs.symlinkSync(other, leaf, 'junction');
+  await assert.rejects(prepareStartup(f), /校验目标不是普通文件/);
 });
 test('directory junctions remain rejected on warm launch', async () => {
   const f = fixture(); await prepareStartup(f);

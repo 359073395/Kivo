@@ -8,7 +8,7 @@ import type {
   AnalyticsPlatform, AccountAnalytics, AccountWhoami,
 } from '../lib/api';
 import type { Page } from './Sidebar';
-import { getWhoamiCache, verifyStale } from '../lib/whoami';
+import { backgroundWhoamiPlatforms, getWhoamiCache, verifyStale } from '../lib/whoami';
 import ContentPanel from './ContentPanel';
 import {
   IconFire, IconCalendar, IconOutputs, IconChat, IconSkills, IconAccounts,
@@ -82,10 +82,10 @@ export default function DashboardPage({ persona, gatewayStatus, apiDirect, agent
       const isLog = (p: AnalyticsPlatform) => p.loggedIn || !!cache[p.platform]?.loggedIn;
       const first = ps.find(isLog);
       if (first) setAnaSel((s) => s || first.platform);
-      // 开页后台自愈：对非 API 式的归因平台真校验（whoami），刷新登录态；
-      // B 站走 cookie、公众号走凭证/官方 API 判定，都不起浏览器。
+      // Only verify known sessions in the background. Discovering every signed-out
+      // platform launches browsers unnecessarily; the account page has explicit checks.
       const API_BASED = new Set(['bilibili', 'wechat-oa']);
-      verifyStale(ps.filter((p) => !API_BASED.has(p.platform)).map((p) => p.platform), {
+      verifyStale(backgroundWhoamiPlatforms(ps).filter((p) => !API_BASED.has(p)), {
         alive: () => aliveRef.current,
         onUpdate: (platform, r) => {
           setWhoamiMap((m) => ({ ...m, [platform]: r }));

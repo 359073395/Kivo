@@ -119,7 +119,7 @@ export default function Sidebar({
     <div className="sidebar">
       <div className="sidebar-header">
         <div className="sidebar-logo">
-          <img className="kivo-logo" src="./static/kivo-icon.png" alt="" aria-hidden="true" />
+          <img className="kivo-logo" src="./static/kivo-icon.png" width={36} height={36} alt="" aria-hidden="true" />
           <h1 style={{ fontSize: 18, letterSpacing: 0.2 }}>Kivo</h1>
           <ThemeToggle />
         </div>

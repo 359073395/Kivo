@@ -1,7 +1,7 @@
 {
   "name": "Kivo · 创作工作台",
   "edition": "full",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "upstream": "https://github.com/ZJU-REAL/Easel",
   "upstreamCommit": "97a2d7ad194558e119e087ca4bfb48d66b7ff286",
   "upstreamVersion": "0.3.0",

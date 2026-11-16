@@ -1,21 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import type { Page } from './components/Sidebar';
-import ChatPage from './components/ChatPage';
-import SkillPage from './components/SkillPage';
-import OutputsPage from './components/OutputsPage';
-import AccountsPage from './components/AccountsPage';
-import ProfilePage from './components/ProfilePage';
 import DashboardPage from './components/DashboardPage';
-import TrendsPage from './components/TrendsPage';
-import CalendarPage from './components/CalendarPage';
-import IdeasPage from './components/IdeasPage';
-import PublishPage from './components/PublishingPage';
-import BreakdownPage from './components/BreakdownPage';
-import KnowledgePage from './components/KnowledgePage';
 import SubNav from './components/SubNav';
-import OnboardingWizard from './components/OnboardingWizard';
-import SettingsPanel from './components/SettingsPanel';
+import { STREAM_FRAME_MS, streamFrameLength } from './lib/streamPresentation';
 import { fetchStatus, fetchPersonas, streamChat, fetchLastTurn, stopChat } from './lib/api';
 import type { PersonaItem, UploadedFile, ChatQuestion } from './lib/api';
 import { availablePersona, parsePersonas } from './lib/personas';
@@ -30,6 +18,23 @@ import {
   saveActiveId,
 } from './lib/store';
 import type { ChatSession, ChatMessage, StreamState } from './lib/store';
+
+// Keep the initial workbench independent of editors, markdown and settings bundles.
+const ChatPage = lazy(() => import('./components/ChatPage'));
+const SkillPage = lazy(() => import('./components/SkillPage'));
+const OutputsPage = lazy(() => import('./components/OutputsPage'));
+const AccountsPage = lazy(() => import('./components/AccountsPage'));
+const ProfilePage = lazy(() => import('./components/ProfilePage'));
+const TrendsPage = lazy(() => import('./components/TrendsPage'));
+const CalendarPage = lazy(() => import('./components/CalendarPage'));
+const IdeasPage = lazy(() => import('./components/IdeasPage'));
+const PublishPage = lazy(() => import('./components/PublishingPage'));
+const BreakdownPage = lazy(() => import('./components/BreakdownPage'));
+const KnowledgePage = lazy(() => import('./components/KnowledgePage'));
+const OnboardingWizard = lazy(() => import('./components/OnboardingWizard'));
+const SettingsPanel = lazy(() => import('./components/SettingsPanel'));
+
+const loadingPage = <div className="dash-empty" role="status">正在打开…</div>;
 
 const ONBOARDING_SEEN_KEY = 'easel_onboarding_seen';
 
@@ -48,6 +53,8 @@ function onboardingSeen(): boolean {
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
+  const currentPageRef = useRef(currentPage);
+  useEffect(() => { currentPageRef.current = currentPage; }, [currentPage]);
   const [personas, setPersonas] = useState<PersonaItem[]>([]);
   const [personasLoaded, setPersonasLoaded] = useState(false);
   const personaRequestId = useRef(0);
@@ -252,22 +259,27 @@ export default function App() {
   // ---- 打字机：分批到达的 token 按节奏吐给界面 ----
   const typingBuf = useRef<Record<string, string>>({});
   const typingTimer = useRef<Record<string, ReturnType<typeof setInterval>>>({});
-  const TYPING_INTERVAL = 12;          // 每 tick 间隔 ms（短回复约 83 字/秒：快且有逐字感）
-
+  const presentationDirty = useRef(new Set<string>());
   const pumpTyping = (sessionId: string) => {
     const buf = typingBuf.current[sessionId] || '';
-    if (!buf) { clearTyping(sessionId); return; }
-    // 动态步长：<80 字逐字吐（83字/秒），每满 80 字每 tick 多吐 1 字，长文更快
-    const step = Math.max(1, Math.floor(buf.length / 80));
+    const thinkingChanged = presentationDirty.current.delete(sessionId);
+    if (!buf && !thinkingChanged) { clearTyping(sessionId); return; }
+    const visible = currentPageRef.current === 'chat' && activeIdRef.current === sessionId
+      && document.visibilityState !== 'hidden';
+    const step = visible ? streamFrameLength(buf) : buf.length;
     const take = buf.slice(0, step);
     typingBuf.current[sessionId] = buf.slice(step);
     const a = streamAcc.current[sessionId]; if (!a) { clearTyping(sessionId); return; }
     a.content += take;
-    setStreams((p) => (p[sessionId] ? { ...p, [sessionId]: { ...p[sessionId], content: a.content } } : p));
+    // Background jobs keep accumulating without re-rendering whichever page is open.
+    if (visible) setStreams((p) => (p[sessionId] ? { ...p, [sessionId]: {
+      ...p[sessionId], content: a.content, thinking: a.thinking,
+      stillWorking: thinkingChanged ? undefined : p[sessionId].stillWorking,
+    } } : p));
   };
   const startTypingPump = (sessionId: string) => {
     if (typingTimer.current[sessionId]) return;
-    typingTimer.current[sessionId] = setInterval(() => pumpTyping(sessionId), TYPING_INTERVAL);
+    typingTimer.current[sessionId] = setInterval(() => pumpTyping(sessionId), STREAM_FRAME_MS);
   };
   const ensureTypingPump = (sessionId: string) => {
     if (!typingTimer.current[sessionId]) startTypingPump(sessionId);
@@ -286,6 +298,22 @@ export default function App() {
     a.content += buf;
     setStreams((p) => (p[sessionId] ? { ...p, [sessionId]: { ...p[sessionId], content: a.content } } : p));
   };
+
+  const syncStreamPresentation = useCallback((sessionId: string) => {
+    const owner = streamAcc.current[sessionId];
+    if (!owner) return;
+    flushTyping(sessionId);
+    setStreams(previous => {
+      const current = previous[sessionId];
+      if (!current || (current.content === owner.content && current.thinking === owner.thinking)) return previous;
+      return { ...previous, [sessionId]: { ...current, content: owner.content, thinking: owner.thinking } };
+    });
+  }, []);
+
+  // Re-entering a running conversation immediately shows its latest background output.
+  useEffect(() => {
+    if (currentPage === 'chat' && activeSessionId) syncStreamPresentation(activeSessionId);
+  }, [currentPage, activeSessionId, syncStreamPresentation]);
 
   const appendAssistant = useCallback((sessionId: string, msg: ChatMessage, sessionKey?: string) => {
     setSessions((prev) => {
@@ -306,6 +334,7 @@ export default function App() {
     flushTyping(sessionId);
     delete streamCtl.current[sessionId];
     delete streamAcc.current[sessionId];
+    presentationDirty.current.delete(sessionId);
     setStreams((prev) => {
       const next = { ...prev };
       delete next[sessionId];
@@ -344,13 +373,16 @@ export default function App() {
 
   useEffect(() => {
     const handleVisibility = () => {
-      if (document.visibilityState !== 'hidden') return;
+      if (document.visibilityState !== 'hidden') {
+        if (currentPageRef.current === 'chat' && activeIdRef.current) syncStreamPresentation(activeIdRef.current);
+        return;
+      }
       for (const sessionId of Object.keys(streamAcc.current)) flushTyping(sessionId);
       for (const pending of [...finalizers.current.values()]) pending.finish();
     };
     document.addEventListener('visibilitychange', handleVisibility);
     return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, []);
+  }, [syncStreamPresentation]);
 
   const closeQuestion = useCallback((sessionId: string, closed: { id: string; status: string }) => {
     const owner = streamAcc.current[sessionId];
@@ -418,8 +450,8 @@ export default function App() {
       (thinkChunk) => {
         const a = streamAcc.current[sessionId]; if (a !== owner) return;
         a.thinking = (a.thinking + thinkChunk).slice(-4000);
-        // 有真实思考流 → 清掉防呆提示（不再显示「未卡住」）
-        setStreams((p) => (p[sessionId] ? { ...p, [sessionId]: { ...p[sessionId], thinking: a.thinking, stillWorking: undefined } } : p));
+        presentationDirty.current.add(sessionId);
+        ensureTypingPump(sessionId);
       },
       (status) => {
         const a = streamAcc.current[sessionId]; if (a !== owner) return;
@@ -483,7 +515,12 @@ export default function App() {
       (err) => {
         finalizeStream(sessionId, owner, undefined, err);
       },
-      (chunk) => { const a = streamAcc.current[sessionId]; if (a === owner) a.thinking = (a.thinking + chunk).slice(-4000); },
+      (chunk) => {
+        const a = streamAcc.current[sessionId]; if (a !== owner) return;
+        a.thinking = (a.thinking + chunk).slice(-4000);
+        presentationDirty.current.add(sessionId);
+        ensureTypingPump(sessionId);
+      },
       (status) => {
         const a = streamAcc.current[sessionId]; if (a !== owner) return;
         if (a.steps[a.steps.length - 1] !== status) a.steps.push(status);
@@ -877,7 +914,7 @@ export default function App() {
           <SubNav current={currentPage} onNavigate={setCurrentPage} />
         )}
         <div className="page-host">
-          {renderPage()}
+          <Suspense fallback={loadingPage}>{renderPage()}</Suspense>
         </div>
       </main>
 
@@ -901,12 +938,12 @@ export default function App() {
 
       {/* 画像配置向导 */}
       {showWizard && (
-        <OnboardingWizard onClose={() => setShowWizard(false)} onCreated={handleProfileCreated} />
+        <Suspense fallback={loadingPage}><OnboardingWizard onClose={() => setShowWizard(false)} onCreated={handleProfileCreated} /></Suspense>
       )}
 
       {/* 设置（统一入口：模型配置 · 环境安装 · 更多设置） */}
       {settingsOpen && (
-        <SettingsPanel
+        <Suspense fallback={loadingPage}><SettingsPanel
           banner={needModelSetup
             ? '请完成所选执行引擎的模型配置，包括 API 地址、模型及服务需要的密钥。保存后可运行连接自测。'
             : ''}
@@ -919,7 +956,7 @@ export default function App() {
               setGatewayStatus(data.gateway ? 'connected' : 'disconnected');
             }).catch(() => setGatewayStatus('disconnected'));
           }}
-        />
+        /></Suspense>
       )}
     </div>
   );

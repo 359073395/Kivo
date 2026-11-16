@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   fetchAccounts, startLogin, loginStatus, mediaUrl,
-  accountWhoami, logoutAccount, submitLoginSms,
+  logoutAccount, submitLoginSms,
   saveCredentials, getCredentials, startMpLogin, mpLoginStatus,
 } from '../lib/api';
 import type { AccountItem, AccountWhoami } from '../lib/api';
-import { getWhoamiCache, setWhoamiCache, verifyStale } from '../lib/whoami';
+import { backgroundWhoamiPlatforms, getWhoamiCache, setWhoamiCache, verifyStale, verifyWhoami } from '../lib/whoami';
 import { IconRefresh } from './icons';
 
 type QRState = {
@@ -64,6 +64,9 @@ export default function AccountsPage() {
   const aliveRef = useRef(true);
   const qrPlatformRef = useRef('');   // 当前登录中的平台，供 submitSms 稳定引用
   const whoamiRequests = useRef<Record<string, number>>({});
+  const accountsPending = useRef(false);
+  const accountsVerifyAll = useRef(false);
+  const accountsLoadedAt = useRef(0);
   const qrRequest = useRef(0);
 
   useEffect(() => {
@@ -76,11 +79,10 @@ export default function AccountsPage() {
     const sequence = (whoamiRequests.current[platform] || 0) + 1;
     whoamiRequests.current[platform] = sequence;
     setWhoami((w) => ({ ...w, [platform]: 'loading' }));
-    accountWhoami(platform, true)
+    verifyWhoami(platform, true, () => aliveRef.current)
       .then((r) => {
         if (aliveRef.current && whoamiRequests.current[platform] === sequence) {
           setWhoami((w) => ({ ...w, [platform]: r }));
-          setWhoamiCache(platform, r);
           setAccounts((list) => list.map((account) =>
             account.platform === platform ? { ...account, loggedIn: r.loggedIn } : account));
         }
@@ -98,19 +100,26 @@ export default function AccountsPage() {
       });
   }, []);
 
-  // 打开页面：拉「快」状态（读 status.json，不起浏览器），随后后台自愈——对缓存缺失/过期的
-  // 浏览器平台逐个真校验（whoami），结果到了刷新 UI，并令陈旧的假阴性缓存被真值覆盖。
-  const load = useCallback(() => {
+  // 自动刷新只校验已有登录线索的平台，避免开页就启动全部平台的浏览器。
+  // 用户主动「刷新」可检查未登录平台，恢复外部浏览器登录后的状态。
+  const load = useCallback((verifyAll = false) => {
+    if (verifyAll) accountsVerifyAll.current = true;
+    if (accountsPending.current) return;
+    accountsPending.current = true;
+    accountsLoadedAt.current = Date.now();
     setErr('');
     fetchAccounts()
       .then((list) => {
         if (!aliveRef.current) return;
+        const verifyAllRequested = accountsVerifyAll.current;
+        accountsVerifyAll.current = false;
         setAccounts(list);
-        const targets = list
-          .filter((a) => a.supported && a.backend !== 'biliup')
-          .map((a) => a.platform);
+        const cache = getWhoamiCache();
+        const eligible = list.filter((a) => a.supported && a.backend !== 'biliup');
+        const targets = verifyAllRequested ? eligible.map((a) => a.platform)
+          : backgroundWhoamiPlatforms(eligible, cache);
         for (const account of list) {
-          const cached = getWhoamiCache()[account.platform];
+          const cached = cache[account.platform];
           if (cached && cached.loggedIn !== account.loggedIn) {
             setWhoamiCache(account.platform, null);
             setWhoami((previous) => {
@@ -121,6 +130,7 @@ export default function AccountsPage() {
           }
         }
         verifyStale(targets, {
+          force: verifyAllRequested,
           alive: () => aliveRef.current,
           onUpdate: (platform, r) => {
             setWhoami((w) => ({ ...w, [platform]: r }));
@@ -129,7 +139,8 @@ export default function AccountsPage() {
           },
         });
       })
-      .catch(() => setErr('加载账号状态失败'));
+      .catch(() => { if (aliveRef.current) setErr('加载账号状态失败'); })
+      .finally(() => { accountsPending.current = false; });
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -137,7 +148,10 @@ export default function AccountsPage() {
   // 切回本标签页 / 窗口重新获得焦点时自动重拉账号态——登录/退出后即使漏了一次刷新，切回来也是最新的，
   // 用户无需手动刷新页面。（登录中弹着二维码时不打扰，避免打断轮询。）
   useEffect(() => {
-    const refresh = () => { if (document.visibilityState === 'visible' && !pollRef.current) load(); };
+    const refresh = () => {
+      if (document.visibilityState === 'visible' && !pollRef.current
+        && Date.now() - accountsLoadedAt.current >= 5000) load();
+    };
     window.addEventListener('focus', refresh);
     document.addEventListener('visibilitychange', refresh);
     return () => {
@@ -397,7 +411,7 @@ export default function AccountsPage() {
           <h1 className="page-title">账号登录</h1>
           <p className="page-subtitle">管理平台账号及登录状态。</p>
         </div>
-        <button className="btn btn-sm" onClick={load}><IconRefresh size={14} /> 刷新</button>
+        <button className="btn btn-sm" onClick={() => load(true)}><IconRefresh size={14} /> 刷新</button>
       </div>
       <div className="accounts-notice">按平台通过扫码或浏览器窗口登录，登录状态保存在本地。若登录页面无法显示，请检查网络或代理环境。</div>
 
