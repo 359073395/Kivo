@@ -47,7 +47,7 @@ async def connection(request: RunRequest, command: list[str], notify, respond, *
     signature = hashlib.sha256(json.dumps([
         str(request.cwd.resolve()), sorted(request.env.items()), command,
         request.model, request.sandbox, harness_instructions(request),
-    ], ensure_ascii=False).encode("utf-8")).hexdigest()
+    ], ensure_ascii=True).encode("utf-8")).hexdigest()
     entry = pool.get(key)
     previous = None
     if entry and entry["busy"]:
@@ -230,7 +230,7 @@ class RPC:
                                             detail = detail.replace(value, "***")
                             future.set_exception(HarnessError(f"Agent 协议错误：{detail}"))
                         else:
-                            future.set_result(message.get("result") or {})
+                            future.set_result(message.get("result"))
         except asyncio.CancelledError:
             raise
         except Exception as error:

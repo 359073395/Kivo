@@ -1,14 +1,14 @@
 {
   "name": "Kivo · 创作工作台",
   "edition": "full",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "upstream": "https://github.com/ZJU-REAL/Easel",
-  "upstreamCommit": "9eaec64a35858405dedacf8ab2627b53fe65b467",
+  "upstreamCommit": "97a2d7ad194558e119e087ca4bfb48d66b7ff286",
   "upstreamVersion": "0.3.0",
   "scope": "保留原平台功能，增加反馈自学习、手动知识和通用API独立工具引擎",
   "upstreamPatchReview": {
-    "reviewedThrough": "9eaec64a35858405dedacf8ab2627b53fe65b467",
-    "date": "2026-11-13",
+    "reviewedThrough": "97a2d7ad194558e119e087ca4bfb48d66b7ff286",
+    "date": "2026-11-16",
     "mode": "full-feature-merge-with-kivo-extensions",
     "areas": [
       "chat-lifecycle",
@@ -28,7 +28,11 @@
       "juejin-twitter-toutiao",
       "paper-promotion-and-paper-video",
       "record-cards",
-      "desktop-media-runtime"
+      "desktop-media-runtime",
+      "durable-chat-recovery",
+      "hermes-acp",
+      "whoami-failure-cooldown",
+      "wechat-and-toutiao-qr-login"
     ]
   }
 }

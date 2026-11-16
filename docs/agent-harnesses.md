@@ -1,17 +1,17 @@
 # Agent 底座接入与本地测试
 
-Easel 将执行底座与模型供应商分开。Web **设置 → 模型配置 → 对话 → 执行引擎**
-统一选择仅聊天模式、OpenClaw、OpenCode、Codex 或通用 ACP。
-标准安装默认安装并使用 OpenClaw；设置中可切换到已安装的其它底座，不自动安装 Codex / OpenCode。
-仅使用 `--api` 安装或没有任何 Agent 配置的环境回退到仅聊天模式。
+Kivo 沿用 Easel 的多执行引擎架构。Web **设置 → 模型配置 → 对话 → 执行引擎**
+统一选择通用 API（独立运行）、OpenClaw、OpenCode、Codex、Hermes 或通用 ACP。
+Kivo 桌面版默认使用通用 API；设置中可切换到已安装的其它底座，不自动安装 Codex / OpenCode / Hermes。
+上游命令行安装脚本仍保留默认 OpenClaw、`--api` 与 `--skip-openclaw` 等安装方式。
 已经保存的底座、旧版连接配置和已有 OpenClaw 安装继续生效，不自动切换。
 改动目前用于本地验证，不要求迁移原有凭证。
 
-底座决定谁负责执行对话和工具，连接由适配器自动管理。Codex、OpenCode、通用 ACP
+底座决定谁负责执行对话和工具，连接由适配器自动管理。Codex、OpenCode、Hermes、通用 ACP
 不需要再选择 API / OpenClaw 连接方式；模型供应商与认证沿用各自原生 CLI 配置。
-原有 API 直连整合为执行引擎列表中的 **仅聊天模式**，不再单独展示连接方式。
-选择框右侧的说明图标支持悬停和键盘聚焦，说明它直接调用模型 API、不启动 Agent，
-适合问答、写作和内容分析，但不能运行本机工具或技能。API 地址、模型与 Key 在下方配置。
+Kivo 的 **通用 API（独立运行）** 直接调用 OpenAI 兼容模型，可检索知识、读取技能和保存作品。
+运行内置脚本或媒体命令时需在交互窗口确认；非交互请求不会自动批准执行。
+模型需支持工具调用。API 地址、模型与 Key 在下方配置，不要求安装其它 Agent 客户端。
 媒体通道配置独立，不随对话底座迁移。这里保留原有配置键和会话历史，避免删入口造成回归。
 
 ## 原生客户端交互并发上限
@@ -50,10 +50,11 @@ OpenClaw 会话与供应商设置。内部 `Adapter.run` 契约统一事件、�
 
 | 底座 | 接入方式 | 认证 | 权限 |
 | --- | --- | --- | --- |
-| 仅聊天模式 | 模型 API 直连，无需 CLI | 独立 `EASEL_DIRECT_API_*` 配置 | 无本机工具 |
+| 通用 API（独立运行） | 模型 API 直连，无需 CLI | 独立 `EASEL_DIRECT_API_*` 配置 | 知识检索、技能读取与作品保存；脚本和媒体命令需逐次确认 |
 | OpenClaw | 保留现有 gateway / CLI 路径 | 原有 OpenClaw 配置 | 原有策略 |
 | OpenCode | `opencode acp`，私有 stdio ACP v1 | `opencode auth login` | OpenCode 原生策略，ACP 权限请求交由 Web 确认 |
 | Codex | `codex app-server`，私有 stdio 原生 RPC | `codex login` 或原生配置 | 默认 workspace-write，网络受限；额外授权需逐次确认 |
+| Hermes Agent | `hermes --profile easel acp`，私有 stdio ACP v1 | 由 Hermes 的独立 `easel` profile 管理 | Hermes 原生策略；Easel 权限确认只提供允许本次 / 拒绝 |
 | 通用 ACP | 本机管理员配置的 argv | 对应 Agent 原生登录 | 对应 Agent 原生策略，不声称提供操作系统沙箱 |
 
 Codex 不必通过第三方 ACP 桥接，以免丢失原生流式事件和权限控制。ACP 作为可复用适配器，
@@ -79,7 +80,7 @@ Windows PowerShell：
 .\setup.ps1 -OpenClaw -NonInteractive
 ```
 
-安装后运行 `easel web`，在「设置 → Agent 底座 → 执行引擎」选择已检测到的 Codex / OpenCode，
+安装后运行 `easel web`，在「设置 → Agent 底座 → 执行引擎」选择已检测到的 Codex / OpenCode / Hermes，
 保存后新建对话。跳过 OpenClaw 的新安装初始为「仅聊天模式」，只需使用已有原生 Agent 时，
 无需填写 OpenClaw 的 API Key；尚未选择 Agent 时也可以进入 Web、管理配置与账号，
 但对话需选择已认证的 Agent 或配置仅聊天模式的模型 API。
@@ -95,7 +96,34 @@ npm install -g @opencode/cli
 opencode auth login
 npm install -g @openai/codex
 codex login
+# Linux / macOS: official Hermes installer; Windows: use the official PowerShell installer
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+# Windows: https://hermes-agent.nousresearch.com/docs/getting-started/installation
+hermes pm install --extra acp
+hermes profile list
 ```
+
+若列表中没有 `easel`，再运行：
+
+```bash
+hermes profile create easel --no-skills
+```
+
+已有同名 profile 时先确认其用途和状态，不要覆盖或删除。确认该 profile 可用后，在其中完成模型供应商登录：
+
+```bash
+hermes --profile easel setup
+```
+
+Easel 只以 Hermes CLI 的 `--profile easel` 启动 `acp` 和 `acp --check`，不会读取、复制或改写默认 Hermes profile 的配置与凭证；Easel 也不会把自身 `.env` 中的模型/API 凭证传给 Hermes。Hermes profile 隔离的是 Hermes 自己的配置、会话、记忆和技能，不是操作系统沙箱；工具仍以运行 Easel 的账户权限访问该账户可读写的文件，权限策略仍由 Hermes 管理。安装向导 `setup.sh` / `setup.ps1` 不负责安装 Hermes。
+
+将内置技能安全地复制到该 profile 的 Hermes home：
+
+```bash
+python -m easel.commands.hermes_skills
+```
+
+脚本通过 `hermes --profile easel config path` 确认 profile 目录，并校验它属于所选的 Hermes 根目录。支持显式 `HERMES_HOME`、Linux/macOS 的 `~/.hermes`，以及 Windows 的 `%LOCALAPPDATA%/hermes` 与传统 `~/.hermes` 布局；已有 `HERMES_HOME` 指向另一 profile 时，仍在同一根目录选择 `easel`。只有在 `easel` profile 已存在时才复制缺失技能；复制先完成到临时目录，中途失败不留下半截技能，不复制运行时 `.env`、Cookie 或公众号凭据文件，也不会创建不完整 profile。遇到同名技能目录会保留原文件并跳过，不删除额外技能。如需更新某个 Easel 副本，先自行备份并移走那个目录，再运行同步命令。
 
 CLI 需要在 Web 的 PATH 中。`easel web` 在非交互启动遗漏 PATH 时，会补充当前服务器账户下
 常见的 npm、nvm、fnm、Volta、用户本地与 OpenCode 安装目录，包括自定义 npm 前缀、
@@ -146,7 +174,7 @@ Web 不提供任意命令输入。内容是 JSON argv 数组，不走 shell。�
   共享身份、业务规则和人格说明位于 `agents/workspace/`，不绑定某个引擎。
   OpenClaw 沿用 `bash agents/sync.sh` 同步；Codex 通过原有 `developerInstructions`、
   OpenCode / ACP 通过原有消息前缀加载全部工作区 Markdown，再追加当前引擎与运行时路径。
-  仅聊天模式没有文件执行能力，不能声明已经加载或执行本地技能。
+  Kivo 通用 API 可读取技能并请求运行脚本；只有实际工具返回成功才可报告已执行。
 - Web 展示的聊天记录保存在当前浏览器本地，原生上下文按服务器持久化的会话 ID 续接；
   刷新或 Web 重启不会新建原生会话，但清空浏览器数据或换浏览器不等同于迁移聊天记录。
 - ACP 不声明客户端文件 / terminal 能力，因此依赖客户端代执行这些工具的 Agent 暂不支持；
@@ -161,9 +189,10 @@ Web 不提供任意命令输入。内容是 JSON argv 数组，不走 shell。�
 - 执行引擎选择 OpenClaw 或仅聊天模式后，会立即显示该引擎自己的 API 配置，
   不需要先切换正在使用的底座。修改 API 前先点击“保存底座”，再保存下方配置；
   仅预览不会更改当前引擎、密钥或模型。
-- Codex 和 OpenCode 的“模型覆盖”提供下拉框，点击“拉取模型”才启动原生 CLI
-  读取列表，不创建对话，也不在打开设置时自动读取。Codex 使用 `model/list`，
-  OpenCode 使用 `opencode models`；列表由原生配置提供，不代表每个模型都已授权可用。
+- Codex、OpenCode 和 Hermes 的“模型覆盖”提供下拉框，点击“拉取模型”才启动原生 CLI
+  读取列表，不在打开设置时自动读取。Codex 使用 `model/list`，OpenCode 使用 `opencode models`，
+  Hermes 从 ACP `session/new.models.availableModels` 读取；Hermes 查询使用独立的短暂 ACP 进程和会话，不发送提示词或复用聊天进程。
+  列表由原生配置提供，不代表每个模型都已授权可用。
 - 可选择其它 GPT 模型或 OpenCode 供应商模型，也可手动填写模型 ID；
   留空沿用原生 CLI 默认模型。保存后请新建对话，原有历史仍绑定原底座与会话。
   读取列表失败时保留原有模型设置；原生认证仍由对应 CLI 管理。
@@ -224,3 +253,5 @@ Windows 启动入口通过单元测试验证，尚未在真实 Windows 系统做
   实际 App 扫码与确认仍需用户验收，不承诺解除平台维护或服务器出口风控。
 - 完整 Python 回归 881 项通过、9 项跳过；前端 33 项测试通过，生产构建成功。
   lint 保留两条已有警告，构建有 bundle 体积提示。README 未修改，未提交或推送。
+
+持久化聊天状态与恢复见 [任务恢复说明](agent-run-store.md)。API 直连及所有执行引擎均只恢复已保存的状态与结果；结果未知时不会自动重新发送提示词或重放工具。Hermes 的 `session/load` 失败时不会自动创建替代会话。
